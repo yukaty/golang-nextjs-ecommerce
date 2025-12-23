@@ -1,0 +1,19 @@
+FROM golang:1.25-alpine
+
+# Install development tools
+RUN go install github.com/air-verse/air@latest
+
+# Working directory inside the container
+WORKDIR /app
+
+# Copy Go module files
+COPY go.mod go.sum ./
+
+# Download Go module dependencies
+RUN go mod download
+
+# Copy all source code
+COPY . .
+
+# Start the server (using air instead of go run for live reloading)
+CMD ["air"]

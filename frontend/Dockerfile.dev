@@ -1,0 +1,14 @@
+FROM node:22-alpine
+
+WORKDIR /app
+
+COPY package.json package-lock.json ./
+
+RUN npm install
+
+COPY . .
+
+# Set API base URL for development environment
+ENV API_BASE_URL=http://backend:8080
+
+CMD ["npm", "run", "dev"]

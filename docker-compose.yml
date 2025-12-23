@@ -1,0 +1,71 @@
+services:
+  db:
+    image: mysql:8.0
+    container_name: go-trailhead-db
+    ports:
+      # Mapping port 3307 on the host to port 3306 in the container
+      - "3307:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - go-trailhead-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "${MYSQL_USER}", "-p${MYSQL_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    container_name: go-trailhead-backend
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.dev
+    ports:
+      - "8080:8080"
+    volumes:
+      # Synchronize the backend folder on the host PC with the container for hot reloading
+      - ./backend:/app
+    environment:
+      DB_DSN: ${DB_DSN}
+      JWT_SECRET: ${JWT_SECRET}
+      STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY}
+      STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET}
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - go-trailhead-network
+
+  frontend:
+    container_name: go-trailhead-frontend
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    ports:
+      - "3000:3000"
+    volumes:
+      # Synchronize the frontend folder on the host PC with the container for hot reloading
+      - ./frontend:/app
+      # Manage node_modules and .next folders within the container
+      - /app/node_modules
+      - /app/.next
+    environment:
+      # Enable polling for file changes for hot reloading in Docker
+      WATCHPACK_POLLING: "true"
+      API_BASE_URL: "http://backend:8080"
+    depends_on:
+      - backend
+    networks:
+      - go-trailhead-network
+
+networks:
+  go-trailhead-network:
+    driver: bridge
+
+volumes:
+  mysql_data:
