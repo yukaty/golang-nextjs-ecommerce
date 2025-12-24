@@ -53,32 +53,32 @@ export default function Header({ user }: HeaderProps) {
   }, [totalQuantity]);
 
   // Common styles for menu items
-  const menuItemStyle = 'block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100';
+  const menuItemStyle = 'block px-4 py-2 text-sm text-stone-700 hover:bg-stone-100';
 
   return (
     <header className="bg-white shadow-md">
-      <div className="container mx-auto px-4 py-3 flex items-center justify-between">
+      <div className="container mx-auto px-4 py-3 flex items-center justify-between gap-4">
         <div className="shrink-0">
           <Link href="/">
-            <Image src="/images/gotrailhead-logo.webp" alt="GoTrailhead" width={910} height={200} className="w-[250px] h-[55px] object-contain"/>
+            <Image src="/images/gotrailhead-logo.webp" alt="GoTrailhead" width={910} height={200} className="w-[180px] md:w-[250px] h-auto object-contain"/>
           </Link>
         </div>
 
-        <nav className="grow text-center mt-8">
-          <ul className="inline-flex divide-x divide-gray-300 list-none">
-            <li className="border-r border-gray-300">
-              <Link href="/" className="block w-[120px] py-3 hover:bg-gray-200 rounded-sm">Home</Link>
+        <nav className="hidden md:block grow text-center mt-8">
+          <ul className="inline-flex divide-x divide-stone-300 list-none">
+            <li className="border-r border-stone-300">
+              <Link href="/" className="block w-[120px] py-3 hover:bg-stone-200 rounded-sm">Home</Link>
             </li>
-            <li className="border-r border-gray-300">
-              <Link href="/products" className="block w-[120px] py-3 hover:bg-gray-200 rounded-sm">Products</Link>
+            <li className="border-r border-stone-300">
+              <Link href="/products" className="block w-[120px] py-3 hover:bg-stone-200 rounded-sm">Products</Link>
             </li>
             <li>
-              <Link href="/contact" className="block w-[120px] py-3 hover:bg-gray-200 rounded-sm">Contact</Link>
+              <Link href="/contact" className="block w-[120px] py-3 hover:bg-stone-200 rounded-sm">Contact</Link>
             </li>
           </ul>
         </nav>
 
-        <div className="flex items-center space-x-6 shrink-0">
+        <div className="flex items-center space-x-3 md:space-x-6 shrink-0">
           <form action="/products" method="GET" className="hidden sm:block">
             <input type="hidden" name="page" value="1" />
             <input type="hidden" name="perPage" value={perPage} />
@@ -88,7 +88,7 @@ export default function Header({ user }: HeaderProps) {
               name="keyword"
               placeholder="Search..."
               defaultValue={keyword}
-              className="border border-gray-300 rounded-md py-1 px-3 text-sm focus:ring-2 focus:ring-indigo-500"
+              className="border border-stone-300 rounded-md py-1 px-3 text-sm focus:ring-2 focus:ring-forest-600"
             />
           </form>
           <Link href="/account/favorites">
@@ -110,7 +110,7 @@ export default function Header({ user }: HeaderProps) {
               )}
             </button>
             {isMenuOpen && (
-              <div className="absolute right-0 w-48 bg-white rounded-md shadow-lg py-1 z-10 border border-gray-300">
+              <div className="absolute right-0 w-48 bg-white rounded-md shadow-lg py-1 z-10 border border-stone-300">
                 {user ? (
                   <>
                     <Link href="/account" onClick={closeMenu} className={menuItemStyle}>

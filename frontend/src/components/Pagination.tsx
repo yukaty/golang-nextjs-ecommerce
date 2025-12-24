@@ -25,9 +25,9 @@ export default function Pagination({ currentPage, totalPages }: PaginationProps)
   };
 
   // Define common styles for pagination buttons
-  const baseClasses = 'min-w-9 h-9 rounded border border-gray-300 mx-1 cursor-pointer';
-  const hover = 'hover:bg-gray-100 hover:text-gray-800';
-  const active = 'bg-indigo-500 text-white border-indigo-500';
+  const baseClasses = 'min-w-9 h-9 rounded border border-stone-300 mx-1 cursor-pointer';
+  const hover = 'hover:bg-stone-100 hover:text-stone-800';
+  const active = 'bg-forest-500 text-white border-forest-500';
   const disabled = 'opacity-50';
 
   return (
@@ -36,7 +36,7 @@ export default function Pagination({ currentPage, totalPages }: PaginationProps)
       <button
         onClick={() => handlePageChange(currentPage - 1)}
         disabled={currentPage === 1}
-        className={`${baseClasses} text-gray-700 ${hover} ${currentPage === 1 ? disabled : ''}`}
+        className={`${baseClasses} text-stone-700 ${hover} ${currentPage === 1 ? disabled : ''}`}
       >
         &lt;
       </button>
@@ -49,7 +49,7 @@ export default function Pagination({ currentPage, totalPages }: PaginationProps)
         const isActive = (page === currentPage);
         return (
           <button key={page} onClick={() => handlePageChange(page)} disabled={isActive}
-            className={`${baseClasses} ${isActive ? active : 'text-gray-700 ' + hover}`}
+            className={`${baseClasses} ${isActive ? active : 'text-stone-700 ' + hover}`}
           >
             {page}
           </button>
@@ -60,7 +60,7 @@ export default function Pagination({ currentPage, totalPages }: PaginationProps)
       <button
         onClick={() => handlePageChange(currentPage + 1)}
         disabled={currentPage === totalPages}
-        className={`${baseClasses} text-gray-700 ${hover} ${currentPage === totalPages ? disabled : ''}`}
+        className={`${baseClasses} text-stone-700 ${hover} ${currentPage === totalPages ? disabled : ''}`}
       >
         &gt;
       </button>

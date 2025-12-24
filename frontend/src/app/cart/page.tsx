@@ -15,8 +15,8 @@ export default function CartPage() {
 
       {cartItems.length === 0 ? (
         <div className="text-center py-16">
-          <p className="text-gray-600">Your cart is empty.</p>
-          <Link href="/products" className="text-indigo-600 hover:underline">← Back to Products</Link>
+          <p className="text-stone-600">Your cart is empty.</p>
+          <Link href="/products" className="text-forest-600 hover:underline">← Back to Products</Link>
         </div>
       ) : (
         <>
@@ -32,14 +32,14 @@ export default function CartPage() {
             ))}
           </div>
 
-          <div className="mt-8 flex justify-between items-center border-t border-gray-300 pt-6">
+          <div className="mt-8 flex justify-between items-center border-t border-stone-300 pt-6">
             <div className="flex flex-col">
               <p className="text-2xl font-bold">Total: ${totalPrice.toLocaleString()}</p>
-              <p className="text-gray-500">All prices include tax.</p>
+              <p className="text-stone-500">All prices include tax.</p>
             </div>
             <Link
               href="/order-confirm"
-              className="bg-indigo-500 hover:bg-indigo-600 text-white py-2 px-6 rounded"
+              className="bg-forest-500 hover:bg-forest-600 text-white py-2 px-6 rounded"
             >
               Proceed to Checkout
             </Link>

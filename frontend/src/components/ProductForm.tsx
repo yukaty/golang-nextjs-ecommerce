@@ -21,7 +21,7 @@ interface ProductFormProps {
 
 // Common style for input fields
 const inputStyle =
-  "w-full border border-gray-300 px-3 py-2 rounded-sm focus:ring-2 focus:ring-indigo-500";
+  "w-full border border-stone-300 px-3 py-2 rounded-sm focus:ring-2 focus:ring-forest-500";
 // Common style for labels
 const labelStyle = "block font-bold mb-1";
 // Common style for badges (indicates required fields)
@@ -110,7 +110,7 @@ export default function ProductForm({
           required={!initialValues.image_url}
           accept="image/*" // Allow image files only
           onChange={handleImageChange}
-          className="text-gray-600 file:bg-gray-50 file:border file:border-gray-300 file:px-4 file:py-2 file:rounded-sm file:cursor-pointer"
+          className="text-stone-600 file:bg-stone-50 file:border file:border-stone-300 file:px-4 file:py-2 file:rounded-sm file:cursor-pointer"
         />
         {previewUrl && (
           <div className="px-8" id="imagePreview">
@@ -177,13 +177,13 @@ export default function ProductForm({
         <button
           type="button"
           onClick={handleCancel}
-          className="w-1/2 bg-gray-200 hover:bg-gray-300 text-gray-700 py-2 rounded-sm"
+          className="w-1/2 bg-stone-200 hover:bg-stone-300 text-stone-700 py-2 rounded-sm"
         >
           Cancel
         </button>
         <button
           type="submit"
-          className="w-1/2 bg-indigo-500 hover:bg-indigo-600 text-white font-semibold py-2 rounded-sm"
+          className="w-1/2 bg-forest-500 hover:bg-forest-600 text-white font-semibold py-2 rounded-sm"
         >
           {submitLabel}
         </button>

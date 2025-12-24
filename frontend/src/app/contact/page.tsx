@@ -3,6 +3,10 @@
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 
 // Contact page
 export default function ContactPage() {
@@ -43,44 +47,46 @@ export default function ContactPage() {
     }
   };
 
-  // Common input field styles
-  const inputStyle = 'w-full border border-gray-300 px-3 py-2 rounded-sm focus:ring-2 focus:ring-indigo-500';
-  // Common label styles
-  const labelStyle = 'block font-bold mb-1';
-  // Common badge styles
-  const badgeStyle = 'ml-2 px-2 py-0.5 bg-red-500 text-white text-xs font-semibold rounded-md';
-
   return (
     <main className="max-w-xl mx-auto py-10">
       <div className="my-4">
-        <Link href="/" className="text-indigo-600 hover:underline">
+        <Link href="/" className="text-forest-600 hover:underline">
           ← Back to Home
         </Link>
       </div>
       <h1 className="text-center mb-6">Contact Us</h1>
       {errorMessage && <p className="text-red-600 text-center mb-4">{errorMessage}</p>}
       <form onSubmit={handleSubmit} className="w-full space-y-6 p-8 bg-white shadow-lg rounded-xl">
-        <label htmlFor="name" className={labelStyle}>
-          Full Name<span className={badgeStyle}>Required</span>
-        </label>
-        <input type="text" id="name" name="name" required className={inputStyle} />
+        <div className="space-y-2">
+          <Label htmlFor="name" className="font-bold">
+            Full Name <Badge variant="destructive" className="ml-2">Required</Badge>
+          </Label>
+          <Input type="text" id="name" name="name" required />
+        </div>
 
-        <label htmlFor="email" className={labelStyle}>
-          Email Address<span className={badgeStyle}>Required</span>
-        </label>
-        <input type="email" id="email" name="email" required className={inputStyle} />
+        <div className="space-y-2">
+          <Label htmlFor="email" className="font-bold">
+            Email Address <Badge variant="destructive" className="ml-2">Required</Badge>
+          </Label>
+          <Input type="email" id="email" name="email" required />
+        </div>
 
-        <label htmlFor="message" className={labelStyle}>
-          Message<span className={badgeStyle}>Required</span>
-        </label>
-        <textarea
-          id="message" name="message" required rows={5}
-          className={inputStyle}
-        ></textarea>
+        <div className="space-y-2">
+          <Label htmlFor="message" className="font-bold">
+            Message <Badge variant="destructive" className="ml-2">Required</Badge>
+          </Label>
+          <textarea
+            id="message"
+            name="message"
+            required
+            rows={5}
+            className="flex min-h-[120px] w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
+          />
+        </div>
 
-        <button type="submit" className="w-full mt-2 bg-indigo-500 hover:bg-indigo-600 text-white py-2 rounded-sm">
+        <Button type="submit" className="w-full mt-2 bg-forest-600 hover:bg-forest-700">
           Submit
-        </button>
+        </Button>
       </form>
     </main>
   );

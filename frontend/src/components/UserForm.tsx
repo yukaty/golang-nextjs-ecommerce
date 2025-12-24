@@ -1,6 +1,10 @@
 'use client';
 
 import React from 'react';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 
 // Type definition for UserForm component props
 interface UserFormProps {
@@ -15,13 +19,6 @@ interface UserFormProps {
   withPassword?: boolean; // Whether to include password input fields
 }
 
-// Common style for input fields
-const inputStyle = 'w-full border border-gray-300 px-3 py-2 rounded-sm focus:ring-2 focus:ring-indigo-500';
-// Common style for labels
-const labelStyle = "block font-bold mb-1";
-// Common style for badges
-const badgeStyle = "ml-2 px-2 py-0.5 bg-red-500 text-white text-xs font-semibold rounded-md";
-
 // Common user form component
 export default function UserForm({
   onSubmit,
@@ -31,41 +28,63 @@ export default function UserForm({
 }: UserFormProps) {
   return (
     <form onSubmit={onSubmit} className="w-full space-y-6 p-8 bg-white shadow-lg rounded-xl">
-      <label className={labelStyle} htmlFor="name">
-        Name<span className={badgeStyle}>Required</span>
-      </label>
-      <input type="text" id="name" name="name" required
-        defaultValue={initialValues.name} className={inputStyle}
-      />
+      <div className="space-y-2">
+        <Label htmlFor="name" className="font-bold">
+          Name <Badge variant="destructive" className="ml-2">Required</Badge>
+        </Label>
+        <Input
+          type="text"
+          id="name"
+          name="name"
+          required
+          defaultValue={initialValues.name}
+        />
+      </div>
 
-      <label className={labelStyle} htmlFor="email">
-        Email Address<span className={badgeStyle}>Required</span>
-      </label>
-      <input type="email" id="email" name="email" required
-        defaultValue={initialValues.email} className={inputStyle}
-      />
+      <div className="space-y-2">
+        <Label htmlFor="email" className="font-bold">
+          Email Address <Badge variant="destructive" className="ml-2">Required</Badge>
+        </Label>
+        <Input
+          type="email"
+          id="email"
+          name="email"
+          required
+          defaultValue={initialValues.email}
+        />
+      </div>
 
       {withPassword && (
         <>
-          <label className={labelStyle} htmlFor="password">
-            Password<span className={badgeStyle}>Required</span>
-          </label>
-          <input type="password" id="password" name="password" required
-            className={inputStyle}
-          />
+          <div className="space-y-2">
+            <Label htmlFor="password" className="font-bold">
+              Password <Badge variant="destructive" className="ml-2">Required</Badge>
+            </Label>
+            <Input
+              type="password"
+              id="password"
+              name="password"
+              required
+            />
+          </div>
 
-          <label className={labelStyle} htmlFor="confirmPassword">
-            Confirm Password<span className={badgeStyle}>Required</span>
-          </label>
-          <input type="password" id="confirmPassword" name="confirmPassword" required
-            className={inputStyle}
-          />
+          <div className="space-y-2">
+            <Label htmlFor="confirmPassword" className="font-bold">
+              Confirm Password <Badge variant="destructive" className="ml-2">Required</Badge>
+            </Label>
+            <Input
+              type="password"
+              id="confirmPassword"
+              name="confirmPassword"
+              required
+            />
+          </div>
         </>
       )}
 
-      <button type="submit" className="w-full mt-2 bg-indigo-500 hover:bg-indigo-600 text-white py-2 rounded-sm">
+      <Button type="submit" className="w-full mt-2 bg-forest-600 hover:bg-forest-700">
         {submitLabel}
-      </button>
+      </Button>
     </form>
   );
 }

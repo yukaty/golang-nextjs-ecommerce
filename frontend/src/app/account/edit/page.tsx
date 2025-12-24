@@ -11,7 +11,7 @@ export default async function UserEditPage() {
   return (
     <main className="max-w-md mx-auto py-10">
       <div className="my-4">
-        <Link href="/account" className="text-indigo-600 hover:underline">
+        <Link href="/account" className="text-forest-600 hover:underline">
           ← Back to My Account
         </Link>
       </div>

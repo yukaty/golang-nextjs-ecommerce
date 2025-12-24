@@ -52,7 +52,7 @@ export default async function ProductsPage({
   const productsPageData: ProductsPageData = await res.json();
   if (!Array.isArray(productsPageData.products)) {
     console.error('Failed to load product data.');
-    return <p className="text-center text-gray-500 text-lg py-10">Failed to load product data.</p>;
+    return <p className="text-center text-stone-500 text-lg py-10">Failed to load product data.</p>;
   }
 
   // Convert to product card format

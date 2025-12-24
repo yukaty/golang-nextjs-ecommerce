@@ -6,6 +6,7 @@ import { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import ProductCard from "@/components/ProductCard";
 import { type ProductData } from "@/types/product";
+import { Button } from "@/components/ui/button";
 
 // Product data type definition
 type Product = Pick<
@@ -68,9 +69,9 @@ export default function Home() {
             Discover premium outdoor gear for every trail
           </p>
           <Link href="/products">
-            <button className="px-6 py-3 bg-white text-blue-800 font-semibold rounded-full shadow-md hover:bg-gray-200 transition-colors text-sm sm:text-base border border-gray-700">
+            <Button size="lg" className="bg-forest-600 hover:bg-forest-700 text-white font-semibold shadow-lg">
               Shop Now
-            </button>
+            </Button>
           </Link>
         </div>
       </section>

@@ -85,10 +85,10 @@ export default function ReviewControls({ productId, loggedIn }: ReviewControlsPr
       <h2 className="mt-2">Post a Review</h2>
       {!loggedIn ? (
         <div className="text-center py-4">
-          <p className="text-gray-600 mb-4">You must be logged in to post a review.</p>
+          <p className="text-stone-600 mb-4">You must be logged in to post a review.</p>
           <button
             onClick={handleLoginRedirect}
-            className="bg-indigo-500 hover:bg-indigo-600 text-white py-2 px-6 rounded-md shadow-md"
+            className="bg-forest-500 hover:bg-forest-600 text-white py-2 px-6 rounded-md shadow-md"
           >
             Log In to Post Review
           </button>
@@ -96,7 +96,7 @@ export default function ReviewControls({ productId, loggedIn }: ReviewControlsPr
       ) : (
         <form onSubmit={handleSubmitReview} className="space-y-4">
           <div>
-            <label htmlFor="score" className="block text-gray-700 font-semibold mb-2">Rating</label>
+            <label htmlFor="score" className="block text-stone-700 font-semibold mb-2">Rating</label>
             <div className="flex text-2xl text-yellow-500">
               {[1, 2, 3, 4, 5].map((s) => (
                 <span
@@ -112,10 +112,10 @@ export default function ReviewControls({ productId, loggedIn }: ReviewControlsPr
           </div>
 
           <div>
-            <label htmlFor="content" className="block text-gray-700 font-semibold mb-2">Comment</label>
+            <label htmlFor="content" className="block text-stone-700 font-semibold mb-2">Comment</label>
             <textarea
               id="content" name="content" rows={4} value={content} disabled={submitting}
-              className="w-full p-3 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 resize-y"
+              className="w-full p-3 border border-stone-300 rounded-md focus:ring-forest-500 focus:border-forest-500 resize-y"
               placeholder="Please share your thoughts and experiences with this product."
               onChange={(e) => setContent(e.target.value)}
             ></textarea>
@@ -126,7 +126,7 @@ export default function ReviewControls({ productId, loggedIn }: ReviewControlsPr
           <button
             type="submit" disabled={submitting}
             className={`w-full py-3 px-4 rounded-md
-              ${submitting ? 'bg-gray-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-700 text-white'}
+              ${submitting ? 'bg-stone-400 cursor-not-allowed' : 'bg-forest-600 hover:bg-forest-700 text-white'}
             `}
           >
             {submitting ? 'Submitting...' : 'Submit Review'}

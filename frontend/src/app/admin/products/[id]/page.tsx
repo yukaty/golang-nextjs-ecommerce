@@ -85,7 +85,7 @@ export default function ProductEditPage() {
 
   // Display while loading product data
   if (loading) {
-    return <div className="text-center py-12 text-gray-600 text-lg">Loading product data...</div>;
+    return <div className="text-center py-12 text-stone-600 text-lg">Loading product data...</div>;
   }
 
   return (

@@ -63,8 +63,8 @@ export default function OrderConfirmPage() {
 
       {cartItems.length === 0 ? (
         <div className="text-center py-16">
-          <p className="text-gray-600">Your cart is empty.</p>
-          <Link href="/products" className="text-indigo-600 hover:underline">← Back to Products</Link>
+          <p className="text-stone-600">Your cart is empty.</p>
+          <Link href="/products" className="text-forest-600 hover:underline">← Back to Products</Link>
         </div>
       ) : (
         <>
@@ -74,13 +74,13 @@ export default function OrderConfirmPage() {
             ))}
           </div>
 
-          <div className="mt-8 border-t border-gray-300 pt-6">
+          <div className="mt-8 border-t border-stone-300 pt-6">
             <label className="block font-bold mb-1" htmlFor="address">
               Shipping Address<span className="ml-2 px-2 py-0.5 bg-red-500 text-white text-xs font-semibold rounded-md">Required</span>
             </label>
             <textarea
               id="address" value={address} placeholder="Enter your shipping address" required
-              className="w-full border border-gray-300 px-3 py-2 rounded-sm focus:ring-2 focus:ring-indigo-500"
+              className="w-full border border-stone-300 px-3 py-2 rounded-sm focus:ring-2 focus:ring-forest-500"
               onChange={(e) => setAddress(e.target.value)}
             />
           </div>
@@ -89,14 +89,14 @@ export default function OrderConfirmPage() {
             <div className="flex justify-between items-center pb-2 font-semibold">
               <span>Subtotal:</span><span>${totalPrice.toLocaleString()}</span>
             </div>
-            <div className="flex justify-between items-center py-4 border-b border-gray-300 font-semibold">
+            <div className="flex justify-between items-center py-4 border-b border-stone-300 font-semibold">
               <span>Shipping:</span><span>${SHIPPING_COST.toLocaleString()}</span>
             </div>
             <div className="flex justify-between items-center pt-4 text-green-600 text-2xl font-bold">
               <span>Total:</span><span>${finalPrice.toLocaleString()}</span>
             </div>
 
-            <p className="text-gray-500 text-sm mt-2 text-right">
+            <p className="text-stone-500 text-sm mt-2 text-right">
               All prices include tax. Payment is processed via Stripe credit card payment.
             </p>
           </div>
@@ -104,11 +104,11 @@ export default function OrderConfirmPage() {
           <div className="mt-8">
             <p className="text-sm">
               Before confirming your order, please read our{' '}
-              <Link href="/terms" target="_blank" rel="noopener noreferrer" className="text-indigo-600 font-bold underline">
+              <Link href="/terms" target="_blank" rel="noopener noreferrer" className="text-forest-600 font-bold underline">
                 Terms of Service
               </Link>
               {' '}and{' '}
-              <Link href="/privacy" target="_blank" rel="noopener noreferrer" className="text-indigo-600 font-bold underline">
+              <Link href="/privacy" target="_blank" rel="noopener noreferrer" className="text-forest-600 font-bold underline">
                 Privacy Policy
               </Link>
               .<br/>By checking the agreement box, you are deemed to have agreed to the above terms.
@@ -117,9 +117,9 @@ export default function OrderConfirmPage() {
               <input
                 type="checkbox" id="agreement-checkbox" checked={isAgreed}
                 onChange={(e) => setIsAgreed(e.target.checked)}
-                className="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
+                className="h-4 w-4 text-forest-600 border-stone-300 rounded focus:ring-forest-500"
               />
-              <label htmlFor="agreement-checkbox" className="ml-2 text-base font-semibold text-gray-800 leading-snug">
+              <label htmlFor="agreement-checkbox" className="ml-2 text-base font-semibold text-stone-800 leading-snug">
                 I agree to the Terms of Service and Privacy Policy
               </label>
             </div>
@@ -131,15 +131,15 @@ export default function OrderConfirmPage() {
               disabled={!isAgreed || !address.trim()}
               className={`py-2 px-6 rounded-sm text-white ${
                 isAgreed && address.trim()
-                  ? 'bg-indigo-500 hover:bg-indigo-600'
-                  : 'bg-gray-400 cursor-not-allowed'
+                  ? 'bg-forest-500 hover:bg-forest-600'
+                  : 'bg-stone-400 cursor-not-allowed'
               }`}
             >
               Proceed to Payment
             </button>
             <button
               type="button" onClick={handleCancel}
-              className="bg-gray-200 hover:bg-gray-300 text-gray-700 py-2 px-6 rounded-sm"
+              className="bg-stone-200 hover:bg-stone-300 text-stone-700 py-2 px-6 rounded-sm"
             >
               Cancel
             </button>

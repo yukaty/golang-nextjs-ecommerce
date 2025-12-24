@@ -47,7 +47,7 @@ export default function PasswordChangePage() {
   };
 
   // Common input field styles
-  const inputStyle = 'w-full border border-gray-300 px-3 py-2 rounded-sm focus:ring-2 focus:ring-indigo-500';
+  const inputStyle = 'w-full border border-stone-300 px-3 py-2 rounded-sm focus:ring-2 focus:ring-forest-500';
   // Common label styles
   const labelStyle = "block font-bold mb-1";
   // Common badge styles
@@ -56,7 +56,7 @@ export default function PasswordChangePage() {
   return (
     <main className="max-w-md mx-auto py-10">
       <div className="my-4">
-        <Link href="/account" className="text-indigo-600 hover:underline">
+        <Link href="/account" className="text-forest-600 hover:underline">
           ← Back to My Account
         </Link>
       </div>
@@ -81,7 +81,7 @@ export default function PasswordChangePage() {
         </label>
         <input type="password" id="confirmPassword" name="confirmPassword" required className={inputStyle} />
 
-        <button type="submit" className="w-full mt-2 bg-indigo-500 hover:bg-indigo-600 text-white py-2 rounded-sm">
+        <button type="submit" className="w-full mt-2 bg-forest-500 hover:bg-forest-600 text-white py-2 rounded-sm">
           Update
         </button>
       </form>

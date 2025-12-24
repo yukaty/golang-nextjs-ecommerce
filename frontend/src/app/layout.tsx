@@ -25,7 +25,7 @@ export default async function RootLayout({
   const user = await getAuthUser();
 
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body
         className={`${inter.variable} antialiased`}
       >

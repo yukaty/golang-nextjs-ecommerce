@@ -19,7 +19,7 @@ export default function AccountPage() {
   }, [sessionId, clearCart]);
 
   // Common menu item styles
-  const menuItemStyle = "w-full flex items-center px-4 pt-4 border border-gray-300 rounded shadow-lg hover:ring-2 hover:ring-indigo-200 hover:shadow-xl hover:bg-gray-100";
+  const menuItemStyle = "w-full flex items-center px-4 pt-4 border border-stone-300 rounded shadow-lg hover:ring-2 hover:ring-forest-200 hover:shadow-xl hover:bg-stone-100";
 
   // Set message based on query parameters
   const message =
@@ -47,28 +47,28 @@ export default function AccountPage() {
           <Link href="/account/edit" className={menuItemStyle}>
             <div className="flex flex-col text-left">
               <h2 className="mt-0 font-medium">Edit Profile</h2>
-              <p className="text-gray-600">Update your name and email address</p>
+              <p className="text-stone-600">Update your name and email address</p>
             </div>
           </Link>
 
           <Link href="/account/password" className={menuItemStyle}>
             <div className="flex flex-col text-left">
               <h2 className="mt-0 font-medium">Change Password</h2>
-              <p className="text-gray-600">Update your password</p>
+              <p className="text-stone-600">Update your password</p>
             </div>
           </Link>
 
           <Link href="/account/orders" className={menuItemStyle}>
             <div className="flex flex-col text-left">
               <h2 className="mt-0 font-medium">Order History</h2>
-              <p className="text-gray-600">View your past orders</p>
+              <p className="text-stone-600">View your past orders</p>
             </div>
           </Link>
 
           <Link href="/account/favorites" className={menuItemStyle}>
             <div className="flex flex-col text-left">
               <h2 className="mt-0 font-medium">Favorite Products</h2>
-              <p className="text-gray-600">View your favorite items</p>
+              <p className="text-stone-600">View your favorite items</p>
             </div>
           </Link>
 
@@ -76,7 +76,7 @@ export default function AccountPage() {
             <button type="submit" className={menuItemStyle}>
               <div className="flex flex-col text-left">
                 <h2 className="mt-0 font-medium">Log Out</h2>
-                <p className="text-gray-600">Sign out of your account</p>
+                <p className="text-stone-600">Sign out of your account</p>
               </div>
             </button>
           </form>

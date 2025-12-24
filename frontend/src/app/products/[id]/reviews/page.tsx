@@ -42,7 +42,7 @@ export default async function ReviewsPage({
   return (
     <main className="p-8">
       <div className="my-4">
-        <Link href={`/products/${productId}`} className="text-indigo-600 hover:underline">
+        <Link href={`/products/${productId}`} className="text-forest-600 hover:underline">
           ← Back to Product Details
         </Link>
       </div>
@@ -50,14 +50,14 @@ export default async function ReviewsPage({
 
       <section className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
         {reviewsPageData.reviews.map((r) => (
-          <div key={r.id} className="p-4 border border-gray-200 rounded-md shadow-sm">
+          <div key={r.id} className="p-4 border border-stone-200 rounded-md shadow-sm">
             <div className="flex items-center text-yellow-500 text-lg mb-2">
               {Array.from({ length: 5 }, (_, i) => (
                 <span key={i}>{i < r.score ? '★' : '☆'}</span>
               ))}
             </div>
-            <p className="text-gray-800 mb-2">{r.content}</p>
-            <p className="text-xs text-gray-500">
+            <p className="text-stone-800 mb-2">{r.content}</p>
+            <p className="text-xs text-stone-500">
               {r.user_name} - {new Date(r.created_at).toLocaleDateString()}
             </p>
           </div>

@@ -68,20 +68,20 @@ export default function FavoritesPage() {
   return (
     <main className="container mx-auto px-4 py-8">
       <div className="my-4">
-        <Link href="/account" className="text-indigo-600 hover:underline">
+        <Link href="/account" className="text-forest-600 hover:underline">
           ← Back to My Account
         </Link>
       </div>
       <h1 className="text-center mb-6">Favorite Products</h1>
       {favorites.length === 0 ? (
         <div className="text-center py-16">
-          <p className="text-gray-600">You have no favorite products yet.</p>
-          <Link href="/products" className="text-indigo-600 hover:underline">← Browse products to find favorites</Link>
+          <p className="text-stone-600">You have no favorite products yet.</p>
+          <Link href="/products" className="text-forest-600 hover:underline">← Browse products to find favorites</Link>
         </div>
       ) : (
         <div className="flex flex-col space-y-6">
           {favorites.map((item) => (
-            <div key={item.id} className="flex items-center gap-6 border border-gray-200 rounded-lg p-6 shadow-sm bg-white">
+            <div key={item.id} className="flex items-center gap-6 border border-stone-200 rounded-lg p-6 shadow-sm bg-white">
               <Link href={`/products/${item.id}`} className="flex-shrink-0">
                 <Image
                   src={item.image_url ? `/uploads/${item.image_url}` : '/images/no-image.jpg'}
@@ -94,9 +94,9 @@ export default function FavoritesPage() {
 
               <div className="flex-1 flex flex-col justify-between gap-4">
                 <h2 className="text-xl">{item.name}</h2>
-                <p className="text-indigo-600 font-bold text-lg">
+                <p className="text-forest-600 font-bold text-lg">
                   ${item.price.toLocaleString()}
-                  <span className="text-base font-normal text-gray-500"> (incl. tax)</span>
+                  <span className="text-base font-normal text-stone-500"> (incl. tax)</span>
                 </p>
               </div>
 
@@ -105,8 +105,8 @@ export default function FavoritesPage() {
                   onClick={!isInCart(item.id.toString()) ? () => handleCart(item) : undefined}
                   disabled={isInCart(item.id.toString())}
                   className={`py-2 px-4 rounded-sm min-w-[150px] ${isInCart(item.id.toString())
-                      ? 'bg-gray-400 text-white cursor-not-allowed'
-                      : 'bg-indigo-500 hover:bg-indigo-600 text-white'
+                      ? 'bg-stone-400 text-white cursor-not-allowed'
+                      : 'bg-forest-500 hover:bg-forest-600 text-white'
                     }`}
                 >
                   {isInCart(item.id.toString()) ? 'In Cart' : 'Add to Cart'}

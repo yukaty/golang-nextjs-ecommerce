@@ -48,13 +48,13 @@ export default function CartControls({ cartItem, stock, loggedIn }: CartControls
       {stock > 0 && (
         <div className="flex items-end gap-4">
           <div className="flex flex-col">
-            <label htmlFor="quantity" className="block text-sm text-gray-700">
+            <label htmlFor="quantity" className="block text-sm text-stone-700">
               Quantity
             </label>
             <select
               id="quantity" name="quantity" value={quantity}
               onChange={(e) => setQuantity(Number(e.target.value))}
-              className="border border-gray-300 rounded-md px-4 py-2 w-24 focus:ring-2 focus:ring-indigo-500"
+              className="border border-stone-300 rounded-md px-4 py-2 w-24 focus:ring-2 focus:ring-forest-500"
             >
               {quantityOptions}
             </select>
@@ -65,8 +65,8 @@ export default function CartControls({ cartItem, stock, loggedIn }: CartControls
             disabled={inCart}
             className={`py-2 px-4 rounded-sm min-w-[130px] ${
               inCart
-                ? 'bg-gray-400 text-white cursor-not-allowed'
-                : 'bg-indigo-500 hover:bg-indigo-600 text-white'
+                ? 'bg-stone-400 text-white cursor-not-allowed'
+                : 'bg-forest-500 hover:bg-forest-600 text-white'
             }`}
           >
             {inCart ? 'In Cart' : 'Add to Cart'}
@@ -75,7 +75,7 @@ export default function CartControls({ cartItem, stock, loggedIn }: CartControls
           {loggedIn && (
             <button
               onClick={handleOrder}
-              className="border border-indigo-500 text-indigo-500 py-2 px-4 rounded-sm hover:bg-indigo-50"
+              className="border border-forest-500 text-forest-500 py-2 px-4 rounded-sm hover:bg-forest-50"
             >
               Proceed to Checkout
             </button>

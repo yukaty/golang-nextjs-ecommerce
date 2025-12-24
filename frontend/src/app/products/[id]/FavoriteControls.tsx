@@ -1,6 +1,8 @@
 'use client';
 
 import { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Heart } from 'lucide-react';
 
 // Type definition for favorite controls component props
 interface FavoriteControlsProps {
@@ -46,12 +48,14 @@ export default function FavoriteControls({ productId, initialFavorite }: Favorit
   };
 
   return (
-    <button
-      onClick={handleToggleFavorite} disabled={loading}
-      className="text-teal-800 hover:underline cursor-pointer"
-      style={{ fontFamily: 'sans-serif' }}
+    <Button
+      onClick={handleToggleFavorite}
+      disabled={loading}
+      variant="outline"
+      className={isFavorite ? 'border-terra-600 text-terra-600 hover:bg-terra-600 hover:text-white' : 'border-forest-600 text-forest-600 hover:bg-forest-600 hover:text-white'}
     >
-      {isFavorite ? '♥ Remove from Favorites' : '♡ Add to Favorites'}
-    </button>
+      <Heart className={`w-4 h-4 mr-2 ${isFavorite ? 'fill-terra-600' : ''}`} />
+      {isFavorite ? 'Remove from Favorites' : 'Add to Favorites'}
+    </Button>
   );
 }

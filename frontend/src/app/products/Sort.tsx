@@ -17,7 +17,7 @@ export default function Sort({ sort, perPage, keyword }: Props) {
       <select
         name="sort"
         value={sort}
-        className="border border-gray-300 rounded px-4 py-2 w-full md:w-48"
+        className="border border-stone-300 rounded px-4 py-2 w-full md:w-48"
         onChange={(e) => e.currentTarget.form?.submit()}
       >
         <option value="new">Newest First</option>

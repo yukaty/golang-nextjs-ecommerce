@@ -40,11 +40,11 @@ export default async function AdminProductsPage({
   const { products, pagination }: ProductsPageData = await res.json()
   if (!Array.isArray(products)) {
     console.error('Failed to load product data.');
-    return <p className="text-center text-gray-500 text-lg py-10">Failed to load product data.</p>;
+    return <p className="text-center text-stone-500 text-lg py-10">Failed to load product data.</p>;
   }
 
   // Common table styles
-  const tableStyle = 'px-5 py-3 border-b border-gray-300';
+  const tableStyle = 'px-5 py-3 border-b border-stone-300';
 
   // Set message based on query parameters
   const message =
@@ -63,10 +63,10 @@ export default async function AdminProductsPage({
       <div className="container mx-auto px-4 py-8">
         <h1 className="text-center">Product List</h1>
         <div className="flex justify-end mb-4">
-          <Link href="/admin/inquiries" className="bg-gray-400 hover:bg-gray-500 text-white py-2 px-4 rounded-sm font-semibold mr-2">
+          <Link href="/admin/inquiries" className="bg-stone-400 hover:bg-stone-500 text-white py-2 px-4 rounded-sm font-semibold mr-2">
             Inquiries
           </Link>
-          <Link href="/admin/products/register" className="bg-indigo-500 hover:bg-indigo-600 text-white py-2 px-4 rounded-sm font-semibold">
+          <Link href="/admin/products/register" className="bg-forest-500 hover:bg-forest-600 text-white py-2 px-4 rounded-sm font-semibold">
             Register Product
           </Link>
         </div>
@@ -74,7 +74,7 @@ export default async function AdminProductsPage({
         <div className="shadow-lg rounded-lg overflow-hidden">
           <table className="min-w-full leading-normal">
             <thead>
-              <tr className="bg-gray-200 text-gray-700 text-left">
+              <tr className="bg-stone-200 text-stone-700 text-left">
                 <th className={tableStyle}>ID</th>
                 <th className={tableStyle}>Product Name</th>
                 <th className={tableStyle}>Price (incl. tax)</th>
@@ -86,13 +86,13 @@ export default async function AdminProductsPage({
             <tbody>
               {products.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className={`${tableStyle} text-center text-gray-500`}>
+                  <td colSpan={6} className={`${tableStyle} text-center text-stone-500`}>
                     No products found.
                   </td>
                 </tr>
               ) : (
                 products.map((product) => (
-                  <tr key={product.id} className="hover:bg-gray-100">
+                  <tr key={product.id} className="hover:bg-stone-100">
                     <td className={tableStyle}>{product.id}</td>
                     <td className={tableStyle}>{product.name}</td>
                     <td className={tableStyle}>${product.price.toLocaleString()}</td>
@@ -103,7 +103,7 @@ export default async function AdminProductsPage({
                     <td className={tableStyle}>
                       <Link
                         href={`/admin/products/${product.id}`}
-                        className="text-indigo-600 hover:text-indigo-700 mr-6"
+                        className="text-forest-600 hover:text-forest-700 mr-6"
                       >
                         Edit
                       </Link>

@@ -33,16 +33,16 @@ export default async function InquiriesPage() {
   const inquiries: Inquiry[] = await res.json()
   if (!Array.isArray(inquiries)) {
     console.error('Failed to load inquiry data.');
-    return <p className="text-center text-gray-500 text-lg py-10">Failed to load inquiry data.</p>;
+    return <p className="text-center text-stone-500 text-lg py-10">Failed to load inquiry data.</p>;
   }
 
   // Common table styles
-  const tableStyle = 'px-5 py-3 border-b border-gray-300';
+  const tableStyle = 'px-5 py-3 border-b border-stone-300';
 
   return (
     <main className="container mx-auto px-4 py-8">
       <div className="my-4">
-        <Link href="/admin/products" className="text-indigo-600 hover:underline">
+        <Link href="/admin/products" className="text-forest-600 hover:underline">
           ← Back to Product List
         </Link>
       </div>
@@ -51,7 +51,7 @@ export default async function InquiriesPage() {
       <div className="shadow-lg rounded-lg overflow-hidden">
         <table className="min-w-full leading-normal">
           <thead>
-            <tr className="bg-gray-200 text-gray-700 text-left">
+            <tr className="bg-stone-200 text-stone-700 text-left">
               <th className={tableStyle}>ID</th>
               <th className={tableStyle}>Full Name</th>
               <th className={tableStyle}>Email Address</th>
@@ -62,13 +62,13 @@ export default async function InquiriesPage() {
           <tbody>
             {inquiries.length === 0 ? (
               <tr>
-                <td colSpan={5} className={`${tableStyle} text-center text-gray-500`}>
+                <td colSpan={5} className={`${tableStyle} text-center text-stone-500`}>
                   No inquiries found.
                 </td>
               </tr>
             ) : (
               inquiries.map((inquiry) => (
-                <tr key={inquiry.id} className="hover:bg-gray-100">
+                <tr key={inquiry.id} className="hover:bg-stone-100">
                   <td className={tableStyle}>{inquiry.id}</td>
                   <td className={tableStyle}>{inquiry.name}</td>
                   <td className={tableStyle}>{inquiry.email}</td>

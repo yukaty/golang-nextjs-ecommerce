@@ -2,6 +2,8 @@
 
 import Image from 'next/image';
 import { CartItem } from '@/hooks/useCart';
+import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 
 interface CartItemCardProps {
   item: CartItem; // Individual cart item data
@@ -25,47 +27,50 @@ export default function CartItemCard({
   ));
 
   return (
-    <div className="flex items-center gap-12 border border-gray-200 rounded p-8">
-      <Image
-        src={item.imageUrl ? `/uploads/${item.imageUrl}` : '/images/no-image.jpg'}
-        alt={item.title}
-        width={120}
-        height={120}
-        className="object-contain"
-      />
-      <div className="grow">
-        <h2 className="text-xl">{item.title}</h2>
-        <p className="text-indigo-600 font-bold text-xl">
-          ${item.price.toLocaleString()}
-          <span className="text-base font-normal text-gray-500"> (incl. tax)</span>
+    <Card>
+      <CardContent className="flex items-center gap-12 p-8">
+        <Image
+          src={item.imageUrl ? `/uploads/${item.imageUrl}` : '/images/no-image.jpg'}
+          alt={item.title}
+          width={120}
+          height={120}
+          className="object-contain"
+        />
+        <div className="grow">
+          <h2 className="text-xl">{item.title}</h2>
+          <p className="text-forest-600 font-bold text-xl">
+            ${item.price.toLocaleString()}
+            <span className="text-base font-normal text-stone-500"> (incl. tax)</span>
+          </p>
+          {isEditable ? (
+            <div className="flex items-center mt-2 gap-4">
+              <label htmlFor={`quantity-${item.id}`} className="text-sm text-stone-700">
+                  Quantity
+              </label>
+              <select
+                  id={`quantity-${item.id}`}
+                  value={item.quantity}
+                  onChange={(e) => onUpdateQuantity && onUpdateQuantity(item.id, Number(e.target.value))}
+                  className="border border-stone-300 rounded-md px-3 py-1 focus:ring-2 focus:ring-forest-600"
+              >
+                  {quantityOptions}
+              </select>
+              <Button
+                  onClick={() => onRemove && onRemove(item.id)}
+                  variant="ghost"
+                  className="text-red-600 hover:text-red-700"
+              >
+                  Remove
+              </Button>
+            </div>
+          ) : (
+            <p className="text-lg font-semibold">Quantity: {item.quantity}</p>
+          )}
+        </div>
+        <p className="text-right font-semibold text-lg w-32">
+          Subtotal: ${(item.price * item.quantity).toLocaleString()}
         </p>
-        {isEditable ? (
-          <div className="flex items-center mt-2 gap-4">
-            <label htmlFor={`quantity-${item.id}`} className="text-sm text-gray-700">
-                Quantity
-            </label>
-            <select
-                id={`quantity-${item.id}`}
-                value={item.quantity}
-                onChange={(e) => onUpdateQuantity && onUpdateQuantity(item.id, Number(e.target.value))}
-                className="border border-gray-300 rounded-md px-3 py-1 focus:ring-2 focus:ring-indigo-500"
-            >
-                {quantityOptions}
-            </select>
-            <button
-                onClick={() => onRemove && onRemove(item.id)}
-                className="text-red-600 hover:underline cursor-pointer"
-            >
-                Remove
-            </button>
-          </div>
-        ) : (
-          <p className="text-lg font-semibold">Quantity: {item.quantity}</p>
-        )}
-      </div>
-      <p className="text-right font-semibold text-lg w-32">
-        Subtotal: ${(item.price * item.quantity).toLocaleString()}
-      </p>
-    </div>
+      </CardContent>
+    </Card>
   );
 }

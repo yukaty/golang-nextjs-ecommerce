@@ -2,7 +2,11 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
+import { useState } from 'react';
 import { useCart } from '@/hooks/useCart';
+import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Heart } from 'lucide-react';
 
 // Type definition for ProductCard component props
 export interface ProductCardProps {
@@ -17,6 +21,7 @@ export interface ProductCardProps {
   reviewCount?: number; // Total review count
 
   showCartButton?: boolean; // Show "Add to Cart" button
+  initialFavorite?: boolean; // Initial favorite state
   className?: string; // For external style adjustments
 }
 
@@ -30,16 +35,56 @@ export default function ProductCard({
   rating,
   reviewCount,
   showCartButton = false,
+  initialFavorite = false,
   className = ''
 }: ProductCardProps) {
   // Get cart management functions
   const { addItem, isInCart } = useCart();
   const inCart = isInCart(id); // Check if item is in cart
 
+  // Favorite state
+  const [isFavorite, setIsFavorite] = useState(initialFavorite);
+  const [favoriteLoading, setFavoriteLoading] = useState(false);
+
   // Event handler for cart button click
   const handleCart = () => {
     // Add to cart
     addItem({ id, title, price, imageUrl });
+  };
+
+  // Event handler for favorite button click
+  const handleToggleFavorite = async (e: React.MouseEvent) => {
+    e.preventDefault(); // Prevent navigation to product page
+    e.stopPropagation();
+
+    setFavoriteLoading(true);
+    try {
+      const method = isFavorite ? 'DELETE' : 'POST';
+      const body = method === 'POST' ? JSON.stringify({ productId: Number(id) }) : null;
+      const url = method === 'DELETE' ? `/api/favorites/${id}` : `/api/favorites`;
+
+      const res = await fetch(url, {
+        method: method,
+        body: body,
+        headers: { 'Content-Type': 'application/json' }
+      });
+
+      if (res.ok) {
+        setIsFavorite(!isFavorite);
+      } else {
+        const data = await res.json();
+        if (res.status === 401) {
+          // Redirect to login if not authenticated
+          window.location.href = '/login';
+        } else {
+          console.error(data.error || 'Favorite operation failed.');
+        }
+      }
+    } catch (err) {
+      console.error('Favorite operation error:', err);
+    } finally {
+      setFavoriteLoading(false);
+    }
   };
 
   // Display placeholder image if no image specified
@@ -56,46 +101,54 @@ export default function ProductCard({
   };
 
   return (
-    <div className={`
-      flex flex-col bg-white max-w-sm w-full p-2
-      ${className}
-    `}>
-      <Link href={`/products/${id}`}>
-        <Image
-          src={finalImageUrl}
-          alt={title || 'Product image'}
-          width={imageSize}
-          height={imageSize}
-          className="w-full object-contain aspect-square"
-        />
-      </Link>
-      <div className="flex flex-col">
-        <h3 className="text-sm font-semibold leading-tight mb-1">{title}</h3>
-        {rating !== undefined && reviewCount !== undefined && (
-          reviewCount > 0 ? (
-            <p className="flex items-center text-sm mb-1">
-              <span className="text-yellow-500 mr-1">{displayStars(rating || 0)}</span>
-              <span className="text-gray-600">({reviewCount} reviews)</span>
-            </p>
-          ) : (
-            <p className="text-xs text-gray-400 mt-1">No reviews yet</p>
-          )
-        )}
-        <div className="flex justify-between items-center w-full mt-2">
-          <p className="text-lg font-bold">${price.toLocaleString()}</p>
-          {showCartButton && (
-            <button
-              onClick={!inCart ? handleCart : undefined}
-              disabled={inCart}
-              className={`border py-2 px-4 rounded-sm
-                ${inCart ? 'bg-indigo-500 text-white' : 'border-indigo-500 text-indigo-500 hover:bg-indigo-400 hover:text-white'}
-              `}
-            >
-              {inCart ? 'In Cart' : 'Add to Cart'}
-            </button>
+    <Card className={`max-w-sm w-full ${className}`}>
+      <CardContent className="p-2 relative">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={handleToggleFavorite}
+          disabled={favoriteLoading}
+          className="absolute top-4 right-4 z-10 bg-white/80 hover:bg-white"
+          title={isFavorite ? 'Remove from favorites' : 'Add to favorites'}
+        >
+          <Heart className={`w-5 h-5 ${isFavorite ? 'fill-terra-600 text-terra-600' : 'text-stone-600'}`} />
+        </Button>
+        <Link href={`/products/${id}`}>
+          <Image
+            src={finalImageUrl}
+            alt={title || 'Product image'}
+            width={imageSize}
+            height={imageSize}
+            className="w-full object-contain aspect-square"
+          />
+        </Link>
+        <div className="flex flex-col mt-2">
+          <h3 className="text-sm font-semibold leading-tight mb-1">{title}</h3>
+          {rating !== undefined && reviewCount !== undefined && (
+            reviewCount > 0 ? (
+              <p className="flex items-center text-sm mb-1">
+                <span className="text-yellow-500 mr-1">{displayStars(rating || 0)}</span>
+                <span className="text-stone-600">({reviewCount} reviews)</span>
+              </p>
+            ) : (
+              <p className="text-xs text-stone-400 mt-1">No reviews yet</p>
+            )
           )}
+          <div className="flex justify-between items-center w-full mt-2">
+            <p className="text-lg font-bold">${price.toLocaleString()}</p>
+            {showCartButton && (
+              <Button
+                onClick={!inCart ? handleCart : undefined}
+                disabled={inCart}
+                variant={inCart ? "default" : "outline"}
+                className={inCart ? 'bg-forest-600 hover:bg-forest-700' : 'border-forest-600 text-forest-600 hover:bg-forest-600 hover:text-white'}
+              >
+                {inCart ? 'In Cart' : 'Add to Cart'}
+              </Button>
+            )}
+          </div>
         </div>
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   )
 }

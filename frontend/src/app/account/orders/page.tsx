@@ -51,9 +51,9 @@ export default function OrdersPage() {
     getOrders();
   }, []);
 
-  if (loading) return <div className="text-center py-12 text-gray-600 text-lg">Loading order history...</div>;
+  if (loading) return <div className="text-center py-12 text-stone-600 text-lg">Loading order history...</div>;
   if (errorMessage) return <p className="text-center py-12 text-red-600">{errorMessage}</p>;
-  if (orders.length === 0) return <p className="text-center py-12 text-gray-500">No order history found.</p>;
+  if (orders.length === 0) return <p className="text-center py-12 text-stone-500">No order history found.</p>;
 
   // Determine display style based on status
   const getStatusStyle = (status: OrderData['status'] | OrderData['paymentStatus']) => {
@@ -73,7 +73,7 @@ export default function OrdersPage() {
       case 'Refunded': // Negative final status
         return 'text-red-500';
       default:
-        return 'text-gray-500'; // Default color
+        return 'text-stone-500'; // Default color
     }
   };
 
@@ -83,7 +83,7 @@ export default function OrdersPage() {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="my-4">
-        <Link href="/account" className="text-indigo-600 hover:underline">
+        <Link href="/account" className="text-forest-600 hover:underline">
           ← Back to My Account
         </Link>
       </div>
@@ -103,9 +103,9 @@ export default function OrdersPage() {
               </div>
             </div>
 
-            <table className="w-full text-left border-t border-gray-200 shadow-lg rounded-lg overflow-hidden">
+            <table className="w-full text-left border-t border-stone-200 shadow-lg rounded-lg overflow-hidden">
               <thead>
-                <tr className="bg-gray-100 text-gray-700">
+                <tr className="bg-stone-100 text-stone-700">
                   <th className={tableStyle}>Product Name</th>
                   <th className={tableStyle}>Quantity</th>
                   <th className={tableStyle}>Unit Price (incl. tax)</th>
@@ -113,7 +113,7 @@ export default function OrdersPage() {
               </thead>
               <tbody>
                 {order.items.map((item, index) => (
-                  <tr key={index} className="hover:bg-gray-50">
+                  <tr key={index} className="hover:bg-stone-50">
                     <td className={tableStyle}>{item.productName}</td>
                     <td className={tableStyle}>{item.quantity}</td>
                     <td className={tableStyle}>${item.unitPrice.toLocaleString()}</td>

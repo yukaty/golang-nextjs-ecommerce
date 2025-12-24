@@ -139,16 +139,16 @@ export default async function ProductDetailPage(props: ProductDetailPageProps) {
         />
         <div className="w-full md:w-1/2 space-y-6 pt-4">
           <h1>{product.name}</h1>
-          <p className="text-gray-700 whitespace-pre-line">{product.description}</p>
-          <p className="text-3xl font-bold text-indigo-600">${product.price.toLocaleString()}<span className="text-base font-normal text-gray-500"> (incl. tax)</span></p>
+          <p className="text-stone-700 whitespace-pre-line">{product.description}</p>
+          <p className="text-3xl font-bold text-forest-600">${product.price.toLocaleString()}<span className="text-base font-normal text-stone-500"> (incl. tax)</span></p>
           {reviewCount > 0 ? (
             <div className="flex items-center mb-4">
               <span className="text-yellow-500 text-xl mr-2">{displayStars(rating)}</span>
-              <span className="text-gray-700 text-base">{rating.toFixed(1)}</span>
-              <span className="text-gray-500 text-sm ml-2">({reviewCount} reviews)</span>
+              <span className="text-stone-700 text-base">{rating.toFixed(1)}</span>
+              <span className="text-stone-500 text-sm ml-2">({reviewCount} reviews)</span>
             </div>
           ) : (
-            <p className="text-gray-500 text-sm mb-4">No reviews yet</p>
+            <p className="text-stone-500 text-sm mb-4">No reviews yet</p>
           )}
           <p className={`text-base font-medium ${stockStyle}`}>Stock Status: {stockText}</p>
 
@@ -175,40 +175,40 @@ export default async function ProductDetailPage(props: ProductDetailPageProps) {
         </div>
       </div>
 
-      <div className="flex flex-col md:flex-row gap-8 mt-6 p-4 border border-gray-300 rounded-md shadow-sm">
+      <div className="flex flex-col md:flex-row gap-8 mt-6 p-4 border border-stone-300 rounded-md shadow-sm">
         <div className="w-full md:w-1/2">
           <h2 className="mt-2">Reviews</h2>
           {reviewCount > 0 ? (
             <ul className="space-y-4 list-none">
               {reviews.slice(0, 3).map(r => (
-                <li key={r.id} className="border-b border-gray-300 pb-2">
+                <li key={r.id} className="border-b border-stone-300 pb-2">
                   <div className="flex items-center text-sm text-yellow-500 mb-1">
                     {displayStars(r.score)}
                   </div>
-                  <p className="text-gray-800">{r.content}</p>
-                  <p className="text-xs text-gray-500 mt-1">
+                  <p className="text-stone-800">{r.content}</p>
+                  <p className="text-xs text-stone-500 mt-1">
                     {r.user_name} - {new Date(r.created_at).toLocaleDateString()}
                   </p>
                 </li>
               ))}
               {reviewCount > 3 && (
                 <div className="text-center mt-4">
-                  <Link href={`/products/${productId}/reviews`} className="text-indigo-600 hover:underline">
+                  <Link href={`/products/${productId}/reviews`} className="text-forest-600 hover:underline">
                     View All Reviews ({reviewCount})
                   </Link>
                 </div>
               )}
             </ul>
           ) : (
-            <p className="text-gray-500">No reviews yet.</p>
+            <p className="text-stone-500">No reviews yet.</p>
           )}
         </div>
-        <div className="w-full md:w-1/2 border-l border-gray-200 pl-6">
+        <div className="w-full md:w-1/2 border-l border-stone-200 pl-6">
           <ReviewControls productId={product.id} loggedIn={loggedIn} />
         </div>
       </div>
-      <div className="mt-8 pt-4 border-t border-gray-200">
-        <Link href="/products" className="text-indigo-600 hover:underline">
+      <div className="mt-8 pt-4 border-t border-stone-200">
+        <Link href="/products" className="text-forest-600 hover:underline">
           ← Back to Products
         </Link>
       </div>

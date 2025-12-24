@@ -5,8 +5,8 @@ export default function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="bg-gray-800 py-4 text-white">
-      <div className="container mx-auto px-4 max-w-6xl grid grid-cols-1 md:grid-cols-[2.5fr_1.5fr_1fr] gap-8 border-b border-gray-700 pb-8 mb-8">
+    <footer className="bg-stone-800 py-4 text-white">
+      <div className="container mx-auto px-4 max-w-6xl grid grid-cols-1 md:grid-cols-[2.5fr_1.5fr_1fr] gap-8 border-b border-stone-700 pb-8 mb-8">
         <div>
           <h3 className="text-xl mb-4">About GoTrailhead</h3>
           <p className="text-sm leading-relaxed">
