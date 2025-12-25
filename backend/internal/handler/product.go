@@ -135,7 +135,7 @@ func GetProductsHandler(c *gin.Context) {
 	err = db.QueryRow(countQuery, whereParams...).Scan(&totalItems)
 	if err != nil {
 		log.Printf("Product count retrieval error: %v", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Server error occurred"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": ErrServerError})
 		return
 	}
 
@@ -169,7 +169,7 @@ func GetProductsHandler(c *gin.Context) {
 	rows, err := db.Query(query, queryParams...)
 	if err != nil {
 		log.Printf("Product list retrieval error: %v", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Server error occurred"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": ErrServerError})
 		return
 	}
 	defer rows.Close()
@@ -195,7 +195,7 @@ func GetProductsHandler(c *gin.Context) {
 			&p.ReviewCount,
 		); err != nil {
 			log.Printf("Product data scan error: %v", err)
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Server error occurred"})
+			c.JSON(http.StatusInternalServerError, gin.H{"error": ErrServerError})
 			return
 		}
 		// Only set ProductListItem ImageURL field if imageUrl variable is not NULL
@@ -206,7 +206,7 @@ func GetProductsHandler(c *gin.Context) {
 	}
 	if err = rows.Err(); err != nil {
 		log.Printf("Row error during product list data retrieval: %v", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Server error occurred"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": ErrServerError})
 		return
 	}
 	// Create pagination information
@@ -229,12 +229,9 @@ func GetProductsHandler(c *gin.Context) {
 
 // Function to return product details
 func GetProductByIDHandler(c *gin.Context) {
-	// Get "product ID" from path parameter (.../products/:id, the :id part)
-	idStr := c.Param("id")
-	id, err := strconv.Atoi(idStr)
+	id, err := GetProductIDFromParam(c, "id")
 	if err != nil {
-		log.Printf("Invalid product ID format: %v", err)
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid product ID"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": ErrInvalidProductID})
 		return
 	}
 
@@ -280,7 +277,7 @@ func GetProductByIDHandler(c *gin.Context) {
 			c.JSON(http.StatusNotFound, gin.H{"error": "Product not found"})
 		} else {
 			log.Printf("Product retrieval error (ID=%d): %v", id, err)
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Server error occurred"})
+			c.JSON(http.StatusInternalServerError, gin.H{"error": ErrServerError})
 		}
 		return
 	}
@@ -459,7 +456,7 @@ func GetHomePageProductsHandler(c *gin.Context) {
 
 	// Return 500 error if any goroutine encountered an error
 	if featuredErr != nil || newArrivalsErr != nil || bestSellersErr != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Server error occurred"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": ErrServerError})
 		return
 	}
 

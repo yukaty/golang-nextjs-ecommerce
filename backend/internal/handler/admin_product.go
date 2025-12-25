@@ -95,7 +95,7 @@ func AdminCreateProductHandler(c *gin.Context) {
 		log.Printf("Product registration error: %v", err)
 		// Delete saved file
 		_ = os.Remove(savePath)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Server error occurred"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": ErrServerError})
 		return
 	}
 
@@ -105,12 +105,9 @@ func AdminCreateProductHandler(c *gin.Context) {
 
 // Function to edit product information
 func AdminUpdateProductHandler(c *gin.Context) {
-	// Get "product ID" from path parameter
-	idStr := c.Param("id")
-	id, err := strconv.Atoi(idStr)
+	id, err := GetProductIDFromParam(c, "id")
 	if err != nil {
-		log.Printf("Invalid product ID format: %v", err)
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid product ID"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": ErrInvalidProductID})
 		return
 	}
 
@@ -127,7 +124,7 @@ func AdminUpdateProductHandler(c *gin.Context) {
 			c.JSON(http.StatusNotFound, gin.H{"error": "Product not found"})
 		} else {
 			log.Printf("Existing product check error (ID=%d): %v", id, err)
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Server error occurred"})
+			c.JSON(http.StatusInternalServerError, gin.H{"error": ErrServerError})
 		}
 		return
 	}
@@ -228,7 +225,7 @@ func AdminUpdateProductHandler(c *gin.Context) {
 		if newFileName != "" {
 			_ = os.Remove(filepath.Join("uploads", newFileName))
 		}
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Server error occurred"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": ErrServerError})
 		return
 	}
 
@@ -247,12 +244,9 @@ func AdminUpdateProductHandler(c *gin.Context) {
 
 // Function to delete product
 func AdminDeleteProductHandler(c *gin.Context) {
-	// Get "product ID" from path parameter (.../products/:id, the :id part)
-	idStr := c.Param("id")
-	id, err := strconv.Atoi(idStr)
+	id, err := GetProductIDFromParam(c, "id")
 	if err != nil {
-		log.Printf("Invalid product ID format: %v", err)
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid product ID"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": ErrInvalidProductID})
 		return
 	}
 
@@ -269,7 +263,7 @@ func AdminDeleteProductHandler(c *gin.Context) {
 			c.JSON(http.StatusNotFound, gin.H{"error": "Product not found"})
 		} else {
 			log.Printf("Existing product check error (ID=%d): %v", id, err)
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Server error occurred"})
+			c.JSON(http.StatusInternalServerError, gin.H{"error": ErrServerError})
 		}
 		return
 	}
@@ -279,7 +273,7 @@ func AdminDeleteProductHandler(c *gin.Context) {
 	_, err = db.Exec(deleteQuery, id)
 	if err != nil {
 		log.Printf("Product deletion error (ID=%d): %v", id, err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Server error occurred"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": ErrServerError})
 		return
 	}
 

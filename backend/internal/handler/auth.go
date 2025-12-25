@@ -6,6 +6,8 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"regexp"
+	"strconv"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -78,6 +80,45 @@ func VerifyToken(tokenString string) (*JWTCustomClaims, error) {
 	}
 }
 
+// GetUserFromContext extracts user claims from gin context
+// Returns claims and true if successful, nil and false otherwise
+func GetUserFromContext(c *gin.Context) (*JWTCustomClaims, bool) {
+	userClaims, exists := c.Get("user")
+	if !exists {
+		return nil, false
+	}
+	claims, ok := userClaims.(*JWTCustomClaims)
+	return claims, ok
+}
+
+// Common error messages
+const (
+	ErrServerError       = "Server error occurred"
+	ErrAuthenticationReq = "Authentication required"
+	ErrInvalidProductID  = "Invalid product ID"
+	ErrInvalidInput      = "Invalid input"
+)
+
+// GetProductIDFromParam extracts and validates product ID from gin context param
+// Returns product ID and nil error if successful, 0 and error otherwise
+func GetProductIDFromParam(c *gin.Context, paramName string) (int, error) {
+	idStr := c.Param(paramName)
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		log.Printf("Invalid product ID format (%s=%s): %v", paramName, idStr, err)
+		return 0, err
+	}
+	return id, nil
+}
+
+// Email validation pattern (compiled once for reuse)
+var emailPattern = regexp.MustCompile(`^[a-zA-Z0-9.]+@[a-zA-Z0-9.]+$`)
+
+// ValidateEmail checks if email matches the required pattern
+func ValidateEmail(email string) bool {
+	return emailPattern.MatchString(email)
+}
+
 // --- 2. Handler Definitions ---
 
 // Function to handle login
@@ -140,7 +181,7 @@ func LoginHandler(c *gin.Context) {
 	tokenString, err := token.SignedString(JWTSecret)
 	if err != nil {
 		log.Printf("JWT signing error: %v", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Server error occurred"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": ErrServerError})
 		return
 	}
 

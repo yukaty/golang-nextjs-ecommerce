@@ -45,12 +45,9 @@ type ReviewRequest struct {
 
 // Function to get reviews list for specified product ID (GET /api/products/:id/reviews)
 func GetReviewsHandler(c *gin.Context) {
-	// Get "product ID" from path parameter (:id)
-	productIDStr := c.Param("id")
-	productID, err := strconv.Atoi(productIDStr)
+	productID, err := GetProductIDFromParam(c, "id")
 	if err != nil {
-		log.Printf("Invalid product ID format (review retrieval): %v", err)
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid product ID"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": ErrInvalidProductID})
 		return
 	}
 
@@ -133,7 +130,7 @@ func GetReviewsHandler(c *gin.Context) {
 	// Wait for all goroutines to complete
 	wg.Wait()
 	if reviewsErr != nil || statsErr != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Server error occurred"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": ErrServerError})
 		return
 	}
 
@@ -167,26 +164,16 @@ func GetReviewsHandler(c *gin.Context) {
 
 // Function to create new review (POST /api/products/:id/reviews)
 func CreateReviewHandler(c *gin.Context) {
-	// Get "product ID" from path parameter (:id)
-	productIDStr := c.Param("id")
-	productID, err := strconv.Atoi(productIDStr)
+	productID, err := GetProductIDFromParam(c, "id")
 	if err != nil {
-		log.Printf("Invalid product ID format (review submission): %v", err)
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid product ID"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": ErrInvalidProductID})
 		return
 	}
 
-	// Get user information from HTTP request context
-	userClaims, exists := c.Get("user")
-	if !exists {
+	claims, ok := GetUserFromContext(c)
+	if !ok {
 		log.Println("CreateReviewHandler: User information not found in context")
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Login required to post review"})
-		return
-	}
-	claims, ok := userClaims.(*JWTCustomClaims) // Type defined in auth.go file
-	if !ok {
-		log.Println("CreateReviewHandler: User information type assertion failed")
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Server error occurred"})
 		return
 	}
 	userID := claims.UserID

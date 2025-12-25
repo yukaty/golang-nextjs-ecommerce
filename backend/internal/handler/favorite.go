@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"log"
 	"net/http"
-	"strconv"
 
 	"github.com/gin-gonic/gin"
 
@@ -27,17 +26,10 @@ type FavoriteStatusResponse struct {
 
 // Function to get list of favorite products (GET /api/favorites)
 func ListFavoritesHandler(c *gin.Context) {
-	// Get user information from HTTP request context
-	userClaims, exists := c.Get("user")
-	if !exists {
+	claims, ok := GetUserFromContext(c)
+	if !ok {
 		log.Println("ListFavoritesHandler: User information not found in context")
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Authentication required"})
-		return
-	}
-	claims, ok := userClaims.(*JWTCustomClaims) // Type defined in auth.go file
-	if !ok {
-		log.Println("ListFavoritesHandler: User information type assertion failed")
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Server error occurred"})
 		return
 	}
 	userID := claims.UserID
@@ -57,7 +49,7 @@ func ListFavoritesHandler(c *gin.Context) {
 	rows, err := db.Query(query, userID)
 	if err != nil {
 		log.Printf("Favorites list retrieval error (UserID=%d): %v", userID, err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Server error occurred"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": ErrServerError})
 		return
 	}
 	defer rows.Close()
@@ -71,7 +63,7 @@ func ListFavoritesHandler(c *gin.Context) {
 		var imageUrl sql.NullString
 		if err := rows.Scan(&p.ID, &p.Name, &p.Price, &imageUrl); err != nil {
 			log.Printf("Favorites data scan error (UserID=%d): %v", userID, err)
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Server error occurred"})
+			c.JSON(http.StatusInternalServerError, gin.H{"error": ErrServerError})
 			return
 		}
 		if imageUrl.Valid {
@@ -81,7 +73,7 @@ func ListFavoritesHandler(c *gin.Context) {
 	}
 	if err = rows.Err(); err != nil {
 		log.Printf("Row error during favorites data retrieval (UserID=%d): %v", userID, err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Server error occurred"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": ErrServerError})
 		return
 	}
 
@@ -91,17 +83,10 @@ func ListFavoritesHandler(c *gin.Context) {
 
 // Function to add product to favorites (POST /api/favorites)
 func AddFavoriteHandler(c *gin.Context) {
-	// Get user information from HTTP request context
-	userClaims, exists := c.Get("user")
-	if !exists {
+	claims, ok := GetUserFromContext(c)
+	if !ok {
 		log.Println("AddFavoriteHandler: User information not found in context")
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Authentication required"})
-		return
-	}
-	claims, ok := userClaims.(*JWTCustomClaims) // Type defined in auth.go file
-	if !ok {
-		log.Println("AddFavoriteHandler: User information type assertion failed")
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Server error occurred"})
 		return
 	}
 	userID := claims.UserID
@@ -133,27 +118,17 @@ func AddFavoriteHandler(c *gin.Context) {
 
 // Function to check if specific product is favorited (GET /api/favorites/:productId)
 func GetFavoriteStatusHandler(c *gin.Context) {
-	// Get user information from HTTP request context
-	userClaims, exists := c.Get("user")
-	if !exists {
+	claims, ok := GetUserFromContext(c)
+	if !ok {
 		log.Println("GetFavoriteStatusHandler: User information not found in context")
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Authentication required"})
 		return
 	}
-	claims, ok := userClaims.(*JWTCustomClaims)
-	if !ok {
-		log.Println("GetFavoriteStatusHandler: User information type assertion failed")
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Server error occurred"})
-		return
-	}
 	userID := claims.UserID
 
-	// Get "product ID" from path parameter (:productId)
-	productIDStr := c.Param("productId")
-	productID, err := strconv.Atoi(productIDStr)
+	productID, err := GetProductIDFromParam(c, "productId")
 	if err != nil {
-		log.Printf("Invalid product ID format (get favorite status): %v", err)
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid product ID"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": ErrInvalidProductID})
 		return
 	}
 
@@ -164,7 +139,7 @@ func GetFavoriteStatusHandler(c *gin.Context) {
 	err = db.QueryRow(query, userID, productID).Scan(&count)
 	if err != nil {
 		log.Printf("Favorite status check error (UserID=%d, ProductID=%d): %v", userID, productID, err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Server error occurred"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": ErrServerError})
 		return
 	}
 
@@ -179,27 +154,17 @@ func GetFavoriteStatusHandler(c *gin.Context) {
 
 // Function to remove product from favorites (DELETE /api/favorites/:productId)
 func RemoveFavoriteHandler(c *gin.Context) {
-	// Get user information from HTTP request context
-	userClaims, exists := c.Get("user")
-	if !exists {
+	claims, ok := GetUserFromContext(c)
+	if !ok {
 		log.Println("RemoveFavoriteHandler: User information not found in context")
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Authentication required"})
 		return
 	}
-	claims, ok := userClaims.(*JWTCustomClaims)
-	if !ok {
-		log.Println("RemoveFavoriteHandler: User information type assertion failed")
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Server error occurred"})
-		return
-	}
 	userID := claims.UserID
 
-	// Get "product ID" from path parameter (:productId)
-	productIDStr := c.Param("productId")
-	productID, err := strconv.Atoi(productIDStr)
+	productID, err := GetProductIDFromParam(c, "productId")
 	if err != nil {
-		log.Printf("Invalid product ID format (remove favorite): %v", err)
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid product ID"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": ErrInvalidProductID})
 		return
 	}
 

@@ -116,17 +116,10 @@ func CreateCheckoutSessionHandler(c *gin.Context) {
 		return
 	}
 
-	// Get user information from HTTP request context
-	userClaims, exists := c.Get("user")
-	if !exists {
+	claims, ok := GetUserFromContext(c)
+	if !ok {
 		log.Println("CreateCheckoutSessionHandler: User information not found in context")
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Authentication required"})
-		return
-	}
-	claims, ok := userClaims.(*JWTCustomClaims)
-	if !ok {
-		log.Println("CreateCheckoutSessionHandler: User information type assertion failed")
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Server error occurred"})
 		return
 	}
 	userID := claims.UserID
@@ -156,7 +149,7 @@ func CreateCheckoutSessionHandler(c *gin.Context) {
 	rows, err := db.Query(query, productIDs...)
 	if err != nil {
 		log.Printf("Product retrieval error during stock check: %v", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Server error occurred"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": ErrServerError})
 		return
 	}
 	defer rows.Close()
@@ -167,7 +160,7 @@ func CreateCheckoutSessionHandler(c *gin.Context) {
 		var p productForOrder
 		if err := rows.Scan(&p.ID, &p.Name, &p.Price, &p.Stock); err != nil {
 			log.Printf("Product scan error during stock check: %v", err)
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Server error occurred"})
+			c.JSON(http.StatusInternalServerError, gin.H{"error": ErrServerError})
 			return
 		}
 		dbProducts[p.ID] = p
@@ -178,7 +171,7 @@ func CreateCheckoutSessionHandler(c *gin.Context) {
 	}
 	if err = rows.Err(); err != nil {
 		log.Printf("Row error during stock check: %v", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Server error occurred"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": ErrServerError})
 		return
 	}
 
@@ -199,7 +192,7 @@ func CreateCheckoutSessionHandler(c *gin.Context) {
 	tx, err := db.Begin()
 	if err != nil {
 		log.Printf("Transaction start error: %v", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Server error occurred"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": ErrServerError})
 		return
 	}
 	defer tx.Rollback() // Rollback on function exit (if not committed)
@@ -485,17 +478,10 @@ func StripeWebhookHandler(c *gin.Context) {
 
 // Function to get order history
 func GetOrdersHandler(c *gin.Context) {
-	// Get user information from HTTP request context
-	userClaims, exists := c.Get("user")
-	if !exists {
+	claims, ok := GetUserFromContext(c)
+	if !ok {
 		log.Println("GetOrdersHandler: User information not found in context")
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Authentication required"})
-		return
-	}
-	claims, ok := userClaims.(*JWTCustomClaims) // Type defined in auth.go file
-	if !ok {
-		log.Println("GetOrdersHandler: User information type assertion failed")
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Server error occurred"})
 		return
 	}
 	userID := claims.UserID
@@ -515,7 +501,7 @@ func GetOrdersHandler(c *gin.Context) {
 	rows, err := db.Query(query, userID)
 	if err != nil {
 		log.Printf("Order history retrieval error (UserID=%d): %v", userID, err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Server error occurred"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": ErrServerError})
 		return
 	}
 	defer rows.Close()
@@ -533,7 +519,7 @@ func GetOrdersHandler(c *gin.Context) {
 		)
 		if err != nil {
 			log.Printf("Order history scan error (UserID=%d): %v", userID, err)
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Server error occurred"})
+			c.JSON(http.StatusInternalServerError, gin.H{"error": ErrServerError})
 			return
 		}
 
@@ -563,7 +549,7 @@ func GetOrdersHandler(c *gin.Context) {
 	}
 	if err = rows.Err(); err != nil {
 		log.Printf("Order history row error (UserID=%d): %v", userID, err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Server error occurred"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": ErrServerError})
 		return
 	}
 

@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"log"
 	"net/http"
-	"regexp"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -57,8 +56,7 @@ func RegisterUserHandler(c *gin.Context) {
 	}
 
 	// Check email address format
-	emailPattern := regexp.MustCompile(`^[a-zA-Z0-9.]+@[a-zA-Z0-9.]+$`)
-	if !emailPattern.MatchString(req.Email) {
+	if !ValidateEmail(req.Email) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Please enter a valid email address format"})
 		return
 	}
@@ -76,7 +74,7 @@ func RegisterUserHandler(c *gin.Context) {
 	// Also check for QueryRow() method errors (e.g., DB connection errors)
 	if err != nil {
 		log.Printf("Email duplicate check error: %v", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Server error occurred"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": ErrServerError})
 		return
 	}
 	if count > 0 {
@@ -88,7 +86,7 @@ func RegisterUserHandler(c *gin.Context) {
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
 	if err != nil {
 		log.Printf("Password hashing error: %v", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Server error occurred"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": ErrServerError})
 		return
 	}
 
@@ -100,7 +98,7 @@ func RegisterUserHandler(c *gin.Context) {
 	_, err = db.Exec(insertQuery, req.Name, req.Email, string(hashedPassword))
 	if err != nil {
 		log.Printf("User registration error: %v", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Server error occurred"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": ErrServerError})
 		return
 	}
 
@@ -110,19 +108,10 @@ func RegisterUserHandler(c *gin.Context) {
 
 // Function to get own user information
 func GetUserMeHandler(c *gin.Context) {
-	// Get claims stored in context by AuthMiddleware function
-	userClaims, exists := c.Get("user")
-	if !exists {
+	claims, ok := GetUserFromContext(c)
+	if !ok {
 		log.Println("GetUserMeHandler: User information not found in context")
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Authentication information not found"})
-		return
-	}
-
-	// Get claims using type assertion
-	claims, ok := userClaims.(*JWTCustomClaims)
-	if !ok {
-		log.Println("GetUserMeHandler: User information type assertion failed")
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Server error occurred"})
 		return
 	}
 
@@ -140,17 +129,10 @@ func GetUserMeHandler(c *gin.Context) {
 
 // Function to edit user information
 func UpdateUserHandler(c *gin.Context) {
-	// Get user information from HTTP request context
-	userClaims, exists := c.Get("user")
-	if !exists {
+	claims, ok := GetUserFromContext(c)
+	if !ok {
 		log.Println("UpdateUserHandler: User information not found in context")
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Authentication required"})
-		return
-	}
-	claims, ok := userClaims.(*JWTCustomClaims) // Type defined in auth.go file
-	if !ok {
-		log.Println("UpdateUserHandler: User information type assertion failed")
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Server error occurred"})
 		return
 	}
 	userID := claims.UserID // User ID to update
@@ -165,8 +147,7 @@ func UpdateUserHandler(c *gin.Context) {
 	}
 
 	// Check email address format
-	emailPattern := regexp.MustCompile(`^[a-zA-Z0-9.]+@[a-zA-Z0-9.]+$`)
-	if !emailPattern.MatchString(req.Email) {
+	if !ValidateEmail(req.Email) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Please enter a valid email address format"})
 		return
 	}
@@ -177,7 +158,7 @@ func UpdateUserHandler(c *gin.Context) {
 	err := db.QueryRow("SELECT COUNT(*) FROM users WHERE email = ? AND id != ?", req.Email, userID).Scan(&count)
 	if err != nil {
 		log.Printf("Email duplicate check error (during update): %v", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Server error occurred"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": ErrServerError})
 		return
 	}
 	if count > 0 {
@@ -190,7 +171,7 @@ func UpdateUserHandler(c *gin.Context) {
 	_, err = db.Exec(updateQuery, req.Name, req.Email, userID)
 	if err != nil {
 		log.Printf("User information update error (UserID=%d): %v", userID, err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Server error occurred"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": ErrServerError})
 		return
 	}
 
@@ -234,17 +215,10 @@ func UpdateUserHandler(c *gin.Context) {
 
 // Function to change password
 func UpdatePasswordHandler(c *gin.Context) {
-	// Get user information from HTTP request context
-	userClaims, exists := c.Get("user")
-	if !exists {
+	claims, ok := GetUserFromContext(c)
+	if !ok {
 		log.Println("UpdatePasswordHandler: User information not found in context")
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Authentication required"})
-		return
-	}
-	claims, ok := userClaims.(*JWTCustomClaims) // Type defined in auth.go file
-	if !ok {
-		log.Println("UpdatePasswordHandler: User information type assertion failed")
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Server error occurred"})
 		return
 	}
 	userID := claims.UserID // User ID to update
@@ -274,7 +248,7 @@ func UpdatePasswordHandler(c *gin.Context) {
 			c.JSON(http.StatusNotFound, gin.H{"error": "User information not found"})
 		} else {
 			log.Printf("Current password retrieval error (UserID=%d): %v", userID, err)
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Server error occurred"})
+			c.JSON(http.StatusInternalServerError, gin.H{"error": ErrServerError})
 		}
 		return
 	}
@@ -291,7 +265,7 @@ func UpdatePasswordHandler(c *gin.Context) {
 	newPasswordHash, err := bcrypt.GenerateFromPassword([]byte(req.NewPassword), bcrypt.DefaultCost)
 	if err != nil {
 		log.Printf("New password hashing error (UserID=%d): %v", userID, err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Server error occurred"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": ErrServerError})
 		return
 	}
 
@@ -300,7 +274,7 @@ func UpdatePasswordHandler(c *gin.Context) {
 	_, err = db.Exec(updateQuery, string(newPasswordHash), userID)
 	if err != nil {
 		log.Printf("Password update error (UserID=%d): %v", userID, err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Server error occurred"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": ErrServerError})
 		return
 	}
 
