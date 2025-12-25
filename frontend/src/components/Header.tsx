@@ -90,8 +90,8 @@ export default function Header({ user }: HeaderProps) {
             )}
           </Link>
           <div className="relative" ref={menuRef}>
-            <button onClick={toggleMenu}  className="cursor-pointer" >
-              <User className="w-6 h-6" />
+            <button onClick={toggleMenu} className="cursor-pointer inline-flex items-center justify-center relative">
+              <User className="w-6 h-6 mt-2" />
               {user && (
                 <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-green-500 rounded-full ring-2 ring-white" />
               )}

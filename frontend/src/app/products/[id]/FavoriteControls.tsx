@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Heart } from 'lucide-react';
-import { cn } from '@/lib/utils';
 import { CONNECTION_ERROR_MESSAGE } from '@/lib/constants';
 import { handleApiResponse } from '@/lib/api';
 

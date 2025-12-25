@@ -4,7 +4,6 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { useCart, CartItem } from '@/hooks/useCart';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/utils';
 
@@ -69,7 +68,7 @@ export default function CartControls({ cartItem, stock, loggedIn }: CartControls
           onClick={!inCart ? handleCart : undefined}
           disabled={inCart}
           variant={inCart ? 'secondary' : 'default'}
-          className="min-w-[130px]"
+          className="min-w-32.5"
         >
           {inCart ? 'In Cart' : 'Add to Cart'}
         </Button>

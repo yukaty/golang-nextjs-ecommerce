@@ -8,7 +8,7 @@ import ProductCard from "@/components/ProductCard";
 import { ProductListItem } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Truck, RotateCcw, Headphones, Mail, ArrowRight } from "lucide-react";
+import { Truck, RotateCcw, Headphones, Mail } from "lucide-react";
 
 export default function Home() {
   const [featured, setFeatured] = useState<ProductListItem[]>([]);
@@ -53,12 +53,12 @@ export default function Home() {
           className="object-cover object-center"
           priority
         />
-        <div className="absolute inset-0 bg-linear-to-b from-black/30 via-transparent to-black/40" />
+        <div className="absolute inset-0 bg-linear-to-b from-black/40 via-black/25 to-black/50" />
         <div className="absolute inset-0 flex flex-col items-center justify-center text-center text-white p-4">
-          <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-6 drop-shadow-2xl px-4">
+          <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-6 px-4 text-shadow-hero">
             Gear Up for Your<br className="sm:hidden" /> Next Adventure
           </h1>
-          <p className="text-lg sm:text-xl md:text-2xl mb-10 drop-shadow-lg px-4 max-w-3xl font-light">
+          <p className="text-lg sm:text-xl md:text-2xl mb-10 px-4 max-w-3xl font-light text-shadow-hero-sub">
             Premium outdoor gear for adventurers
           </p>
           <Link href="/products">
@@ -73,7 +73,7 @@ export default function Home() {
       <section className="bg-stone-100 border-y border-stone-200">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 max-w-7xl">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
-            <div className="flex items-center gap-4 justify-center md:justify-start">
+            <div className="flex items-center gap-4 justify-center">
               <div className="shrink-0 w-12 h-12 rounded-full bg-forest-100 flex items-center justify-center">
                 <Truck className="w-6 h-6 text-forest-700" />
               </div>
@@ -82,7 +82,7 @@ export default function Home() {
                 <p className="text-sm text-stone-600">On orders over $50</p>
               </div>
             </div>
-            <div className="flex items-center gap-4 justify-center md:justify-start">
+            <div className="flex items-center gap-4 justify-center">
               <div className="shrink-0 w-12 h-12 rounded-full bg-forest-100 flex items-center justify-center">
                 <RotateCcw className="w-6 h-6 text-forest-700" />
               </div>
@@ -91,7 +91,7 @@ export default function Home() {
                 <p className="text-sm text-stone-600">60-day return policy</p>
               </div>
             </div>
-            <div className="flex items-center gap-4 justify-center md:justify-start">
+            <div className="flex items-center gap-4 justify-center">
               <div className="shrink-0 w-12 h-12 rounded-full bg-forest-100 flex items-center justify-center">
                 <Headphones className="w-6 h-6 text-forest-700" />
               </div>
@@ -109,7 +109,7 @@ export default function Home() {
           <h2 className="text-2xl sm:text-3xl font-bold text-stone-900 mb-6 sm:mb-8 text-center md:text-left">
             Featured Products
           </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 sm:gap-6">
+          <div className="grid grid-cols-3 gap-3 sm:gap-6">
             {featured.slice(0, 3).map((item) => (
               <ProductCard
                 key={`featured-${item.id}`}
@@ -118,6 +118,7 @@ export default function Home() {
                 price={item.price}
                 imageUrl={item.image_url ?? undefined}
                 imageSize={400}
+                variant="minimal"
               />
             ))}
           </div>
