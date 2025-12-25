@@ -28,12 +28,7 @@ docker-compose exec db mysql -u root -p${MYSQL_ROOT_PASSWORD} go_trailhead_db < 
 
 ### What it does
 1. Disables foreign key checks temporarily
-2. Truncates/deletes all seed data:
-   - Order items and orders
-   - Favorites and reviews
-   - Inquiries
-   - Test users (ID 1-10)
-   - Test products (ID 1-35)
+2. Truncates/deletes all seed data
 3. Re-enables foreign key checks
 
 ### After running

@@ -1,5 +1,6 @@
 INSERT INTO users (id, name, email, password, is_admin, enabled) VALUES
 (1, 'Admin User', 'admin@example.com', '$2a$10$2JNjTwZBwo7fprL2X4sv.OEKqxnVtsVQvuXDkI8xVGix.U3W5B7CO', true, true),
+(2, 'Demo User', 'demo@example.com', '$2a$10$2JNjTwZBwo7fprL2X4sv.OEKqxnVtsVQvuXDkI8xVGix.U3W5B7CO', false, true),
 (101, 'Alex Hiker', 'alex101@example.com', '$2a$10$2JNjTwZBwo7fprL2X4sv.OEKqxnVtsVQvuXDkI8xVGix.U3W5B7CO', false, true),
 (102, 'Sam Camping', 'sam102@example.com', '$2a$10$2JNjTwZBwo7fprL2X4sv.OEKqxnVtsVQvuXDkI8xVGix.U3W5B7CO', false, true),
 (103, 'Coffee Lover', 'coffee103@example.com', '$2a$10$2JNjTwZBwo7fprL2X4sv.OEKqxnVtsVQvuXDkI8xVGix.U3W5B7CO', false, true),

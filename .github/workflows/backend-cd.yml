@@ -1,0 +1,75 @@
+name: Backend CI/CD
+
+on:
+  push:
+    branches: deploy
+    paths:
+      - 'backend/**'
+      - '.github/workflows/backend-cd.yml'
+
+env:
+  PROJECT_ID: ${{ secrets.GOOGLE_CLOUD_PROJECT_ID }}            # GCP project ID
+  GAR_LOCATION: ${{ secrets.CLOUD_RUN_REGION }}                 # Artifact Registry location
+  SERVICE_NAME: ${{ secrets.CLOUD_RUN_BACKEND_SERVICE }}        # Cloud Run service name
+  REGION: ${{ secrets.CLOUD_RUN_REGION }}                       # Cloud Run region
+  REPO_NAME: ${{ secrets.ARTIFACT_REGISTRY_REPO }}              # Artifact Registry full path
+  SQL_CONNECTION_NAME: ${{ secrets.CLOUD_SQL_CONNECTION_NAME }} # Cloud SQL connection name
+
+jobs:
+  build-push-deploy:
+    name: Build, Push and Deploy Backend
+    runs-on: ubuntu-latest
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Authenticate to Google Cloud
+      id: auth
+      uses: google-github-actions/auth@v2
+      with:
+        credentials_json: ${{ secrets.GOOGLE_CLOUD_SA_KEY }}
+
+    - name: Set up Cloud SDK
+      uses: google-github-actions/setup-gcloud@v2
+
+    - name: Configure Docker
+      run: gcloud auth configure-docker ${{ env.GAR_LOCATION }}-docker.pkg.dev --quiet
+
+    - name: Build Docker image
+      uses: docker/build-push-action@v5
+      with:
+        context: ./backend
+        file: ./backend/Dockerfile
+        push: true
+        tags: ${{ env.REPO_NAME }}/backend:${{ github.sha }}
+
+    - name: Deploy to Cloud Run
+      id: deploy
+      uses: google-github-actions/deploy-cloudrun@v2
+      with:
+        service: ${{ env.SERVICE_NAME }}
+        region: ${{ env.REGION }}
+        image: ${{ env.REPO_NAME }}/backend:${{ github.sha }}
+        env_vars: |
+          APP_ENV=production
+          FRONTEND_BASE_URL=${{ secrets.CLOUD_RUN_FRONTEND_URL }}
+          COOKIE_DOMAIN=${{ secrets.CLOUD_RUN_FRONTEND_DOMAIN }}
+          DB_USER=go_trailhead_user
+          DB_NAME=go_trailhead_db
+          DB_SOCKET_PATH=/cloudsql/${{ env.SQL_CONNECTION_NAME }}
+        secrets: |
+          DB_PASSWORD=DB_PASSWORD:latest
+          JWT_SECRET=JWT_SECRET:latest
+          STRIPE_SECRET_KEY=STRIPE_SECRET_KEY:latest
+          STRIPE_WEBHOOK_SECRET=STRIPE_WEBHOOK_SECRET:latest
+        flags: >-
+          --add-cloudsql-instances "${{ env.SQL_CONNECTION_NAME }}"
+          --allow-unauthenticated
+
+    - name: Show deployed URL
+      run: echo "Deployed Backend URL - ${{ steps.deploy.outputs.url }}"
+
