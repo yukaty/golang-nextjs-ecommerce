@@ -3,85 +3,86 @@
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { useCart, CartItem } from '@/hooks/useCart';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { cn } from '@/lib/utils';
 
-// Type definition for cart controls component props
-type CartControlsProps = {
+const MAX_CART_QUANTITY = 10;
+
+interface CartControlsProps {
   cartItem: Omit<CartItem, 'quantity'>;
   stock: number;
   loggedIn: boolean;
-};
+}
 
-// Cart controls component (for product detail page)
 export default function CartControls({ cartItem, stock, loggedIn }: CartControlsProps) {
   const router = useRouter();
   const { addItem, isInCart } = useCart();
-  const inCart = isInCart(cartItem.id); // Whether item is already in cart
-
-  // Quantity selection state
+  const inCart = isInCart(cartItem.id);
   const [quantity, setQuantity] = useState(1);
 
-  // Generate quantity select box options
-  const quantityOptions = [];
-  for (let i = 1; i <= Math.min(stock, 10); i++) { // Maximum 10 items
-    quantityOptions.push(<option key={i} value={i}>{i}</option>);
-  }
+  const quantityOptions = Array.from(
+    { length: Math.min(stock, MAX_CART_QUANTITY) },
+    (_, i) => i + 1
+  );
 
-  // Event handler for add to cart button
   const handleCart = () => {
-    // Add selected quantity to cart
-    addItem({...cartItem}, quantity);
+    addItem({ ...cartItem }, quantity);
   };
 
-  // Event handler for proceed to checkout button
   const handleOrder = () => {
-    // Only add to cart if not already added
     if (!inCart) {
       addItem({ ...cartItem }, quantity);
     }
-
-    // Navigate to order confirmation page
     router.push('/order-confirm');
   };
 
+  if (stock === 0) return null;
+
   return (
     <div className="space-y-6 mt-8">
-      {stock > 0 && (
-        <div className="flex items-end gap-4">
-          <div className="flex flex-col">
-            <label htmlFor="quantity" className="block text-sm text-stone-700">
-              Quantity
-            </label>
-            <select
-              id="quantity" name="quantity" value={quantity}
-              onChange={(e) => setQuantity(Number(e.target.value))}
-              className="border border-stone-300 rounded-md px-4 py-2 w-24 focus:ring-2 focus:ring-forest-500"
-            >
-              {quantityOptions}
-            </select>
-          </div>
-
-          <button
-            onClick={!inCart ? handleCart : undefined}
-            disabled={inCart}
-            className={`py-2 px-4 rounded-sm min-w-[130px] ${
-              inCart
-                ? 'bg-stone-400 text-white cursor-not-allowed'
-                : 'bg-forest-500 hover:bg-forest-600 text-white'
-            }`}
+      <div className="flex items-end gap-4">
+        <div className="flex flex-col">
+          <Label htmlFor="quantity" className="text-sm">
+            Quantity
+          </Label>
+          <select
+            id="quantity"
+            name="quantity"
+            value={quantity}
+            onChange={(e) => setQuantity(Number(e.target.value))}
+            className={cn(
+              "h-9 w-24 rounded-md border border-input bg-background px-3 py-1 text-sm",
+              "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+            )}
           >
-            {inCart ? 'In Cart' : 'Add to Cart'}
-          </button>
-
-          {loggedIn && (
-            <button
-              onClick={handleOrder}
-              className="border border-forest-500 text-forest-500 py-2 px-4 rounded-sm hover:bg-forest-50"
-            >
-              Proceed to Checkout
-            </button>
-          )}
+            {quantityOptions.map((num) => (
+              <option key={num} value={num}>
+                {num}
+              </option>
+            ))}
+          </select>
         </div>
-      )}
+
+        <Button
+          onClick={!inCart ? handleCart : undefined}
+          disabled={inCart}
+          variant={inCart ? 'secondary' : 'default'}
+          className="min-w-[130px]"
+        >
+          {inCart ? 'In Cart' : 'Add to Cart'}
+        </Button>
+
+        {loggedIn && (
+          <Button
+            onClick={handleOrder}
+            variant="outline"
+          >
+            Proceed to Checkout
+          </Button>
+        )}
+      </div>
     </div>
   );
 }

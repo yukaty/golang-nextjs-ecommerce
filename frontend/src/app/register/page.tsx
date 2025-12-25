@@ -3,16 +3,16 @@
 import UserForm from '@/components/UserForm';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { ERROR_MESSAGE_STYLE, CONNECTION_ERROR_MESSAGE } from '@/lib/constants';
+import { handleApiResponse } from '@/lib/api';
 
-// User registration page
 export default function UserRegisterPage() {
   const router = useRouter();
-  const [errorMessage, setErrorMessage] = useState(''); // Error message
+  const [errorMessage, setErrorMessage] = useState('');
 
-  // Event handler for form submission
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault(); // Cancel default submit behavior
-    setErrorMessage(''); // Clear errors before submission
+    e.preventDefault();
+    setErrorMessage('');
 
     const formData = new FormData(e.currentTarget);
     const name = formData.get('name') as string;
@@ -20,7 +20,6 @@ export default function UserRegisterPage() {
     const password = formData.get('password') as string;
     const confirmPassword = formData.get('confirmPassword') as string;
 
-    // Input data validation
     if (!name?.trim() || !email?.trim() || !password?.trim() || !confirmPassword?.trim()) {
       setErrorMessage('Please fill in all required fields.');
       return;
@@ -30,21 +29,23 @@ export default function UserRegisterPage() {
       return;
     }
 
-    try { // Send POST request to user registration API
+    try {
       const res = await fetch('/api/users', {
         method: 'POST',
         body: JSON.stringify({ name, email, password }),
         headers: { 'Content-Type': 'application/json' }
       });
 
-      if (res.ok) { // Navigate to top page on successful registration
-        router.push('/?registered=1'); // Notify success via query parameter
-      } else { // Display error info on registration failure
-        const data = await res.json();
-        setErrorMessage(data.error || 'Registration failed.');
+      const { error } = await handleApiResponse<unknown>(res);
+
+      if (error) {
+        setErrorMessage(error);
+        return;
       }
+
+      router.push('/?registered=1');
     } catch {
-      setErrorMessage('A connection error occurred.');
+      setErrorMessage(CONNECTION_ERROR_MESSAGE);
     }
   };
 
@@ -52,7 +53,7 @@ export default function UserRegisterPage() {
     <main className="max-w-md mx-auto py-10">
       <h1 className="text-center mb-4">Register</h1>
       {errorMessage && (
-        <p className="text-red-600 text-center mt-8">{errorMessage}</p>
+        <p className={`${ERROR_MESSAGE_STYLE} mt-8`}>{errorMessage}</p>
       )}
       <UserForm
         onSubmit={handleSubmit}

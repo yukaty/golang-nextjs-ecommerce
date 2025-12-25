@@ -2,12 +2,15 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { cn } from '@/lib/utils';
+import { FORM_CONTAINER_STYLE } from '@/lib/constants';
 
-// Type definition for ProductForm component props
 interface ProductFormProps {
-  // Event handler executed on form submission
   onSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
-  // Initial values for input fields
   initialValues?: {
     name: string;
     image_url?: string | null | undefined;
@@ -16,19 +19,9 @@ interface ProductFormProps {
     stock?: number;
     is_featured?: boolean;
   };
-  submitLabel: string; // Label for form submit button
+  submitLabel: string;
 }
 
-// Common style for input fields
-const inputStyle =
-  "w-full border border-stone-300 px-3 py-2 rounded-sm focus:ring-2 focus:ring-forest-500";
-// Common style for labels
-const labelStyle = "block font-bold mb-1";
-// Common style for badges (indicates required fields)
-const badgeStyle =
-  "ml-2 px-2 py-0.5 bg-red-500 text-white text-xs font-semibold rounded-md";
-
-// Common product form component
 export default function ProductForm({
   onSubmit,
   initialValues = {
@@ -44,14 +37,12 @@ export default function ProductForm({
   const router = useRouter();
   const [previewUrl, setPreviewUrl] = useState("");
 
-  // Display existing image if available
   useEffect(() => {
     if (initialValues.image_url) {
       setPreviewUrl(`/uploads/${initialValues.image_url}`);
     }
   }, [initialValues.image_url]);
 
-  // Release temporary URL created by URL.createObjectURL()
   useEffect(() => {
     return () => {
       if (previewUrl && previewUrl.startsWith("blob:")) {
@@ -60,24 +51,18 @@ export default function ProductForm({
     };
   }, [previewUrl]);
 
-  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) {
-      // Clear image information
       setPreviewUrl("");
       return;
     }
-
-    // Generate temporary URL for displaying image in browser
-    const tempUrl = URL.createObjectURL(file);
-    setPreviewUrl(tempUrl);
+    setPreviewUrl(URL.createObjectURL(file));
   };
 
-  // Event handler for cancel
   const handleCancel = () => {
-    // Display confirmation dialog
     if (confirm("Discard changes? Are you sure?")) {
-      router.push("/admin/products"); // Navigate to admin products list page
+      router.push("/admin/products");
     }
   };
 
@@ -85,108 +70,121 @@ export default function ProductForm({
     <form
       onSubmit={onSubmit}
       encType="multipart/form-data"
-      className="w-full space-y-6 p-8 bg-white shadow-lg rounded-xl"
+      className={FORM_CONTAINER_STYLE}
     >
-      <label className={labelStyle} htmlFor="name">
-        Product Name<span className={badgeStyle}>Required</span>
-      </label>
-      <input
-        type="text"
-        id="name"
-        name="name"
-        required
-        defaultValue={initialValues.name}
-        className={inputStyle}
-      />
-
-      <label className={labelStyle} htmlFor="imageFile">
-        Product Image<span className={badgeStyle}>Required</span>
-      </label>
-      <div className="flex flex-col gap-6 mt-2">
-        <input
-          type="file"
-          id="imageFile"
-          name="imageFile"
-          required={!initialValues.image_url}
-          accept="image/*" // Allow image files only
-          onChange={handleImageChange}
-          className="text-stone-600 file:bg-stone-50 file:border file:border-stone-300 file:px-4 file:py-2 file:rounded-sm file:cursor-pointer"
+      <div className="space-y-2">
+        <Label htmlFor="name" className="font-bold">
+          Product Name <Badge variant="destructive" className="ml-2">Required</Badge>
+        </Label>
+        <Input
+          type="text"
+          id="name"
+          name="name"
+          required
+          defaultValue={initialValues.name}
         />
-        {previewUrl && (
-          <div className="px-8" id="imagePreview">
-            <img
-              src={previewUrl}
-              alt="preview"
-              className="object-cover rounded-md shadow-md"
-            />
-          </div>
-        )}
       </div>
 
-      <label className={labelStyle} htmlFor="description">
-        Description
-      </label>
-      <textarea
-        id="description"
-        name="description"
-        rows={5}
-        defaultValue={initialValues.description ?? ""}
-        className={inputStyle}
-      />
+      <div className="space-y-2">
+        <Label htmlFor="imageFile" className="font-bold">
+          Product Image <Badge variant="destructive" className="ml-2">Required</Badge>
+        </Label>
+        <div className="flex flex-col gap-6 mt-2">
+          <Input
+            type="file"
+            id="imageFile"
+            name="imageFile"
+            required={!initialValues.image_url}
+            accept="image/*"
+            onChange={handleImageChange}
+            className="text-stone-600 file:bg-stone-50 file:border file:border-stone-300 file:px-4 file:py-2 file:rounded-sm file:cursor-pointer"
+          />
+          {previewUrl && (
+            <div className="px-8" id="imagePreview">
+              <img
+                src={previewUrl}
+                alt="preview"
+                className="object-cover rounded-md shadow-md"
+              />
+            </div>
+          )}
+        </div>
+      </div>
 
-      <label className={labelStyle} htmlFor="price">
-        Price (incl. tax)<span className={badgeStyle}>Required</span>
-      </label>
-      <input
-        type="number"
-        id="price"
-        name="price"
-        required
-        min="0"
-        step="1" // Allow integers 0 and above only
-        defaultValue={initialValues.price}
-        className={inputStyle}
-      />
-
-      <label className={labelStyle} htmlFor="stock">
-        Stock<span className={badgeStyle}>Required</span>
-      </label>
-      <input
-        type="number"
-        id="stock"
-        name="stock"
-        required
-        min="0"
-        step="1" // Allow integers 0 and above only
-        defaultValue={initialValues.stock}
-        className={inputStyle}
-      />
-
-      <label className={labelStyle} htmlFor="isFeatured">
-        <input
-          type="checkbox"
-          id="isFeatured"
-          name="isFeatured"
-          defaultChecked={initialValues.is_featured}
-          className="mr-2"
+      <div className="space-y-2">
+        <Label htmlFor="description" className="font-bold">
+          Description
+        </Label>
+        <textarea
+          id="description"
+          name="description"
+          rows={5}
+          defaultValue={initialValues.description ?? ""}
+          className={cn(
+            "w-full rounded-md border border-input bg-background px-3 py-2 text-sm",
+            "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+          )}
         />
-        Display as featured product
-      </label>
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="price" className="font-bold">
+          Price (incl. tax) <Badge variant="destructive" className="ml-2">Required</Badge>
+        </Label>
+        <Input
+          type="number"
+          id="price"
+          name="price"
+          required
+          min="0"
+          step="1"
+          defaultValue={initialValues.price}
+        />
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="stock" className="font-bold">
+          Stock <Badge variant="destructive" className="ml-2">Required</Badge>
+        </Label>
+        <Input
+          type="number"
+          id="stock"
+          name="stock"
+          required
+          min="0"
+          step="1"
+          defaultValue={initialValues.stock}
+        />
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="isFeatured" className="font-bold">
+          <input
+            type="checkbox"
+            id="isFeatured"
+            name="isFeatured"
+            defaultChecked={initialValues.is_featured}
+            className="mr-2"
+          />
+          Display as featured product
+        </Label>
+      </div>
 
       <div className="flex justify-end space-x-4 mt-6">
-        <button
+        <Button
           type="button"
           onClick={handleCancel}
-          className="w-1/2 bg-stone-200 hover:bg-stone-300 text-stone-700 py-2 rounded-sm"
+          variant="secondary"
+          className="w-1/2"
         >
           Cancel
-        </button>
-        <button
+        </Button>
+        <Button
           type="submit"
-          className="w-1/2 bg-forest-500 hover:bg-forest-600 text-white font-semibold py-2 rounded-sm"
+          className="w-1/2"
         >
           {submitLabel}
-        </button>
+        </Button>
       </div>
     </form>
   );

@@ -2,82 +2,76 @@
 
 import { useRouter, usePathname } from 'next/navigation';
 import { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Label } from '@/components/ui/label';
+import { cn } from '@/lib/utils';
+import { CONNECTION_ERROR_MESSAGE } from '@/lib/constants';
+import { handleApiResponse } from '@/lib/api';
 
-// Type definition for review controls component props
-type ReviewControlsProps = {
+interface ReviewControlsProps {
   productId: number;
   loggedIn: boolean;
-};
+}
 
-// Review controls component (for product detail page)
 export default function ReviewControls({ productId, loggedIn }: ReviewControlsProps) {
   const router = useRouter();
-  const pathname = usePathname(); // Get current path
+  const pathname = usePathname();
+  const [rating, setRating] = useState(0);
+  const [clickedRating, setClickedRating] = useState(0);
+  const [content, setContent] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
-  // Review form state management
-  const [rating, setRating] = useState(0); // Rating (star count)
-  const [clickedRating, setClickedRating] = useState(0); // Confirmed star selection
-  const [content, setContent] = useState(''); // Review content
-  const [submitting, setSubmitting] = useState(false); // Submission in progress flag
-  const [errorMessage, setErrorMessage] = useState(''); // Error message
-  const [successMessage, setSuccessMessage] = useState<string | null>(null); // Success message
-
-  // Event handler when rating star is clicked
   const handleScoreClick = (selectedScore: number) => {
     setRating(selectedScore);
     setClickedRating(selectedScore);
   };
 
-  // Event handler when review submit button is pressed
   const handleSubmitReview = async (e: React.FormEvent) => {
-    e.preventDefault(); // Cancel default submit behavior
+    e.preventDefault();
     setErrorMessage('');
     setSuccessMessage('');
 
-    // Input data validation
     if (rating === 0 || !content.trim()) {
       setErrorMessage('Please fill in all required fields.');
       return;
     }
-    // Login required
     if (!loggedIn) {
       setErrorMessage('You must be logged in to post a review.');
       return;
     }
 
-    // Update display during submission
     setSubmitting(true);
 
-    try { // Send POST request to review registration API
+    try {
       const res = await fetch(`/api/products/${productId}/reviews`, {
         method: 'POST',
         body: JSON.stringify({ rating, content }),
         headers: { 'Content-Type': 'application/json' }
       });
 
-      if (res.ok) { // Refresh on successful submission
-        setSuccessMessage('Your review has been submitted successfully!');
-        // Reset form
-        setRating(0);
-        setContent('');
-        // Refresh to show latest reviews
-        router.refresh();
-      } else { // Display error info on submission failure
-        const data = await res.json();
-        setErrorMessage(data.error || 'Failed to submit review.');
+      const { error } = await handleApiResponse<unknown>(res);
+
+      if (error) {
+        setErrorMessage(error);
+        return;
       }
+
+      setSuccessMessage('Your review has been submitted successfully!');
+      setRating(0);
+      setContent('');
+      router.refresh();
     } catch {
-      setErrorMessage('A connection error occurred.');
+      setErrorMessage(CONNECTION_ERROR_MESSAGE);
     } finally {
       setSubmitting(false);
     }
   };
 
-  // Click handler for non-logged-in users
   const handleLoginRedirect = () => {
-    // Set current page URL as redirect destination
     const redirectUrl = encodeURIComponent(pathname);
-    router.push(`/login?redirect=${redirectUrl}`); // Navigate to login page
+    router.push(`/login?redirect=${redirectUrl}`);
   };
 
   return (
@@ -86,24 +80,22 @@ export default function ReviewControls({ productId, loggedIn }: ReviewControlsPr
       {!loggedIn ? (
         <div className="text-center py-4">
           <p className="text-stone-600 mb-4">You must be logged in to post a review.</p>
-          <button
-            onClick={handleLoginRedirect}
-            className="bg-forest-500 hover:bg-forest-600 text-white py-2 px-6 rounded-md shadow-md"
-          >
+          <Button onClick={handleLoginRedirect}>
             Log In to Post Review
-          </button>
+          </Button>
         </div>
       ) : (
         <form onSubmit={handleSubmitReview} className="space-y-4">
           <div>
-            <label htmlFor="score" className="block text-stone-700 font-semibold mb-2">Rating</label>
+            <Label htmlFor="score" className="font-semibold mb-2">Rating</Label>
             <div className="flex text-2xl text-yellow-500">
               {[1, 2, 3, 4, 5].map((s) => (
                 <span
-                  key={s} className="cursor-pointer"
+                  key={s}
+                  className="cursor-pointer"
                   onClick={() => handleScoreClick(s)}
-                  onMouseEnter={() => setRating(s)} // Temporarily update to star under cursor
-                  onMouseLeave={() => setRating(clickedRating)} // Return to last clicked star
+                  onMouseEnter={() => setRating(s)}
+                  onMouseLeave={() => setRating(clickedRating)}
                 >
                   {s <= rating ? '★' : '☆'}
                 </span>
@@ -112,25 +104,32 @@ export default function ReviewControls({ productId, loggedIn }: ReviewControlsPr
           </div>
 
           <div>
-            <label htmlFor="content" className="block text-stone-700 font-semibold mb-2">Comment</label>
+            <Label htmlFor="content" className="font-semibold mb-2">Comment</Label>
             <textarea
-              id="content" name="content" rows={4} value={content} disabled={submitting}
-              className="w-full p-3 border border-stone-300 rounded-md focus:ring-forest-500 focus:border-forest-500 resize-y"
+              id="content"
+              name="content"
+              rows={4}
+              value={content}
+              disabled={submitting}
+              className={cn(
+                "w-full rounded-md border border-input bg-background px-3 py-2 text-sm",
+                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+                "disabled:cursor-not-allowed disabled:opacity-50 resize-y"
+              )}
               placeholder="Please share your thoughts and experiences with this product."
               onChange={(e) => setContent(e.target.value)}
-            ></textarea>
-            {errorMessage && <p className="text-red-500">{errorMessage}</p>}
-            {successMessage && <p className="text-green-600">{successMessage}</p>}
+            />
+            {errorMessage && <p className="text-red-500 mt-1">{errorMessage}</p>}
+            {successMessage && <p className="text-green-600 mt-1">{successMessage}</p>}
           </div>
 
-          <button
-            type="submit" disabled={submitting}
-            className={`w-full py-3 px-4 rounded-md
-              ${submitting ? 'bg-stone-400 cursor-not-allowed' : 'bg-forest-600 hover:bg-forest-700 text-white'}
-            `}
+          <Button
+            type="submit"
+            disabled={submitting}
+            className="w-full"
           >
             {submitting ? 'Submitting...' : 'Submit Review'}
-          </button>
+          </Button>
         </form>
       )}
     </div>

@@ -7,73 +7,60 @@ import { useSearchParams } from 'next/navigation';
 import { Heart, ShoppingCart, User } from 'lucide-react';
 import { useCart } from '@/hooks/useCart';
 import { type AuthUser } from '@/lib/auth';
+import { cn } from '@/lib/utils';
 
-// Type definition for Header component props
 export interface HeaderProps {
   user: AuthUser | null;
-};
+}
 
-// Common header component
+const MENU_ITEM_STYLE = 'block px-4 py-2 text-sm text-stone-700 hover:bg-stone-100';
+
 export default function Header({ user }: HeaderProps) {
-  const [isMenuOpen, setIsMenuOpen] = useState(false); // User menu open/closed state
-  const menuRef = useRef<HTMLDivElement>(null); // Reference to menu DOM element
-  // Function to close the menu
-  const closeMenu = () => setIsMenuOpen(false);
-  // Function to toggle menu open/closed state
-  const toggleMenu = () => setIsMenuOpen(prev => !prev);
-
-  // Get total quantity of items in cart
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
   const { totalQuantity } = useCart();
-  // Display quantity for cart badge (initialized to 0)
   const [displayQuantity, setDisplayQuantity] = useState(0);
-
   const searchParams = useSearchParams();
   const perPage = searchParams.get('perPage') || '16';
   const sort = searchParams.get('sort') || 'new';
   const keyword = searchParams.get('keyword') || '';
 
-  // Detect clicks outside menu and close it
+  const closeMenu = () => setIsMenuOpen(false);
+  const toggleMenu = () => setIsMenuOpen(prev => !prev);
+
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
-      // Close menu if clicked outside
       if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
         closeMenu();
       }
     };
-    // Event listener to detect clicks outside menu
     document.addEventListener('click', handleClickOutside);
-
-    // Cleanup: remove event listener
     return () => document.removeEventListener('click', handleClickOutside);
   }, []);
 
-  // Update display when cart quantity changes
   useEffect(() => {
     setDisplayQuantity(totalQuantity);
   }, [totalQuantity]);
-
-  // Common styles for menu items
-  const menuItemStyle = 'block px-4 py-2 text-sm text-stone-700 hover:bg-stone-100';
 
   return (
     <header className="bg-white shadow-md">
       <div className="container mx-auto px-4 py-3 flex items-center justify-between gap-4">
         <div className="shrink-0">
           <Link href="/">
-            <Image src="/images/gotrailhead-logo.webp" alt="GoTrailhead" width={910} height={200} className="w-[180px] md:w-[250px] h-auto object-contain"/>
+            <Image src="/images/gotrailhead-logo.webp" alt="GoTrailhead" width={910} height={200} className="w-45 md:w-62.5 h-auto object-contain"/>
           </Link>
         </div>
 
         <nav className="hidden md:block grow text-center mt-8">
           <ul className="inline-flex divide-x divide-stone-300 list-none">
             <li className="border-r border-stone-300">
-              <Link href="/" className="block w-[120px] py-3 hover:bg-stone-200 rounded-sm">Home</Link>
+              <Link href="/" className="block w-30 py-3 hover:bg-stone-200 rounded-sm">Home</Link>
             </li>
             <li className="border-r border-stone-300">
-              <Link href="/products" className="block w-[120px] py-3 hover:bg-stone-200 rounded-sm">Products</Link>
+              <Link href="/products" className="block w-30 py-3 hover:bg-stone-200 rounded-sm">Products</Link>
             </li>
             <li>
-              <Link href="/contact" className="block w-[120px] py-3 hover:bg-stone-200 rounded-sm">Contact</Link>
+              <Link href="/contact" className="block w-30 py-3 hover:bg-stone-200 rounded-sm">Contact</Link>
             </li>
           </ul>
         </nav>
@@ -113,21 +100,21 @@ export default function Header({ user }: HeaderProps) {
               <div className="absolute right-0 w-48 bg-white rounded-md shadow-lg py-1 z-10 border border-stone-300">
                 {user ? (
                   <>
-                    <Link href="/account" onClick={closeMenu} className={menuItemStyle}>
+                    <Link href="/account" onClick={closeMenu} className={MENU_ITEM_STYLE}>
                       My Account
                     </Link>
                     <form method="POST" action="/api/auth/logout">
-                      <button type="submit" className={`${menuItemStyle} w-full text-left`}>
+                      <button type="submit" className={cn(MENU_ITEM_STYLE, 'w-full text-left')}>
                         Logout
                       </button>
                     </form>
                   </>
                 ) : (
                   <>
-                    <Link href="/login" onClick={closeMenu} className={menuItemStyle}>
+                    <Link href="/login" onClick={closeMenu} className={MENU_ITEM_STYLE}>
                       Login
                     </Link>
-                    <Link href="/register" onClick={closeMenu} className={menuItemStyle}>
+                    <Link href="/register" onClick={closeMenu} className={MENU_ITEM_STYLE}>
                       Register
                     </Link>
                   </>

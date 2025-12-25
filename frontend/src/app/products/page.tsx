@@ -1,17 +1,12 @@
 import React from 'react';
 import ProductList from '@/components/ProductList';
 import { type ProductCardProps } from '@/components/ProductCard';
-import { type ProductData } from '@/types/product';
+import { ProductListItem } from '@/lib/types';
 import Pagination from '@/components/Pagination';
 import Sort from '@/app/products/Sort';
 
-// Product data type definition
-type Product = Pick<ProductData, 'id' | 'name' | 'price' | 'image_url' | 'review_avg' | 'review_count'>;
-
-// Data required for products page
 interface ProductsPageData {
-  products: Product[]; // Product data array
-  // Pagination information
+  products: ProductListItem[];
   pagination: {
     currentPage: number;
     perPage: number;
@@ -20,22 +15,17 @@ interface ProductsPageData {
   };
 }
 
-// Products listing page
 export default async function ProductsPage({
   searchParams,
 }: {
-  searchParams?: Promise<{ [key: string]: string | string[] | undefined }>
+  searchParams?: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
-  // searchParams is obtained asynchronously, so await is required
   const sp = await searchParams;
-
-  // Get required data from URL query parameters
   const page = Number(sp?.page ?? '1');
   const perPage = Number(sp?.perPage ?? '16');
   const sort = typeof sp?.sort === 'string' ? sp.sort : 'new';
   const keyword = typeof sp?.keyword === 'string' ? sp.keyword : '';
 
-  // Combine query parameters into a single string
   const query = new URLSearchParams({
     page: String(page),
     perPage: String(perPage),
@@ -43,20 +33,17 @@ export default async function ProductsPage({
     keyword
   });
 
-  // Fetch product data from API
   const res = await fetch(`${process.env.API_BASE_URL}/api/products?${query.toString()}`, {
     cache: 'no-store'
   });
 
-  // Convert returned data from API to JavaScript array
   const productsPageData: ProductsPageData = await res.json();
   if (!Array.isArray(productsPageData.products)) {
     console.error('Failed to load product data.');
     return <p className="text-center text-stone-500 text-lg py-10">Failed to load product data.</p>;
   }
 
-  // Convert to product card format
-  const products: ProductCardProps[] = productsPageData.products.map((row: Product) => ({
+  const products: ProductCardProps[] = productsPageData.products.map((row) => ({
     id: String(row.id),
     title: row.name,
     price: row.price,
@@ -66,10 +53,10 @@ export default async function ProductsPage({
   }));
 
   return (
-    <main className="p-8">
-      <h1>Products</h1>
-      <section className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
-        <p className="text-lg mt-4">
+    <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+      <h1 className="text-2xl sm:text-3xl font-bold mb-4 sm:mb-6">Products</h1>
+      <section className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4 mb-6">
+        <p className="text-sm sm:text-base lg:text-lg">
           {keyword && (
             <>
               Search results for "<span className="text-blue-600 font-semibold">{keyword}</span>":&nbsp;

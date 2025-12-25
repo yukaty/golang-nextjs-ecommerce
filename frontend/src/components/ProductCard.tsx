@@ -7,25 +7,29 @@ import { useCart } from '@/hooks/useCart';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Heart } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { handleApiResponse } from '@/lib/api';
 
-// Type definition for ProductCard component props
 export interface ProductCardProps {
-  id: string; // Product ID
-  title: string; // Product title
-  price: number; // Product price
-
-  imageUrl?: string; // Product image URL
-  imageSize?: 300 | 400; // Image size
-
-  rating?: number; // Review rating (average)
-  reviewCount?: number; // Total review count
-
-  showCartButton?: boolean; // Show "Add to Cart" button
-  initialFavorite?: boolean; // Initial favorite state
-  className?: string; // For external style adjustments
+  id: string;
+  title: string;
+  price: number;
+  imageUrl?: string;
+  imageSize?: 300 | 400;
+  rating?: number;
+  reviewCount?: number;
+  showCartButton?: boolean;
+  initialFavorite?: boolean;
+  className?: string;
 }
 
-// Common product card component
+const displayStars = (avgRating: number) => {
+  const rating = Math.round(avgRating);
+  const filledStars = '★'.repeat(rating);
+  const emptyStars = '☆'.repeat(5 - rating);
+  return `${filledStars}${emptyStars}`;
+};
+
 export default function ProductCard({
   id,
   title,
@@ -38,23 +42,17 @@ export default function ProductCard({
   initialFavorite = false,
   className = ''
 }: ProductCardProps) {
-  // Get cart management functions
   const { addItem, isInCart } = useCart();
-  const inCart = isInCart(id); // Check if item is in cart
-
-  // Favorite state
+  const inCart = isInCart(id);
   const [isFavorite, setIsFavorite] = useState(initialFavorite);
   const [favoriteLoading, setFavoriteLoading] = useState(false);
 
-  // Event handler for cart button click
   const handleCart = () => {
-    // Add to cart
     addItem({ id, title, price, imageUrl });
   };
 
-  // Event handler for favorite button click
   const handleToggleFavorite = async (e: React.MouseEvent) => {
-    e.preventDefault(); // Prevent navigation to product page
+    e.preventDefault();
     e.stopPropagation();
 
     setFavoriteLoading(true);
@@ -69,17 +67,18 @@ export default function ProductCard({
         headers: { 'Content-Type': 'application/json' }
       });
 
-      if (res.ok) {
-        setIsFavorite(!isFavorite);
-      } else {
-        const data = await res.json();
+      const { error } = await handleApiResponse<unknown>(res);
+
+      if (error) {
         if (res.status === 401) {
-          // Redirect to login if not authenticated
           window.location.href = '/login';
         } else {
-          console.error(data.error || 'Favorite operation failed.');
+          console.error(error);
         }
+        return;
       }
+
+      setIsFavorite(!isFavorite);
     } catch (err) {
       console.error('Favorite operation error:', err);
     } finally {
@@ -87,63 +86,61 @@ export default function ProductCard({
     }
   };
 
-  // Display placeholder image if no image specified
-  const finalImageUrl = imageUrl
-    ? `/uploads/${imageUrl}`
-    : '/images/no-image.jpg';
-
-  // Determine star rating display
-  const displayStars = (avgRating: number) => {
-    const rating = Math.round(avgRating); // Round
-    const filledStars = '★'.repeat(rating); // Fill stars based on rating
-    const emptyStars = '☆'.repeat(5 - rating); // Remaining stars are empty
-    return `${filledStars}${emptyStars}`;
-  };
+  const finalImageUrl = imageUrl ? `/uploads/${imageUrl}` : '/images/no-image.jpg';
 
   return (
-    <Card className={`max-w-sm w-full ${className}`}>
-      <CardContent className="p-2 relative">
+    <Card className={`group max-w-sm w-full transition-all duration-300 hover:shadow-lg hover:-translate-y-1 ${className}`}>
+      <CardContent className="p-3 sm:p-4 relative">
         <Button
           variant="ghost"
           size="icon"
           onClick={handleToggleFavorite}
           disabled={favoriteLoading}
-          className="absolute top-4 right-4 z-10 bg-white/80 hover:bg-white"
+          className="absolute top-4 right-4 sm:top-6 sm:right-6 z-10 bg-white/90 hover:bg-white shadow-sm transition-all duration-200"
           title={isFavorite ? 'Remove from favorites' : 'Add to favorites'}
         >
-          <Heart className={`w-5 h-5 ${isFavorite ? 'fill-terra-600 text-terra-600' : 'text-stone-600'}`} />
+          <Heart className={`w-4 h-4 sm:w-5 sm:h-5 transition-colors ${isFavorite ? 'fill-terra-600 text-terra-600' : 'text-stone-600'}`} />
         </Button>
-        <Link href={`/products/${id}`}>
-          <Image
-            src={finalImageUrl}
-            alt={title || 'Product image'}
-            width={imageSize}
-            height={imageSize}
-            className="w-full object-contain aspect-square"
-          />
+        <Link href={`/products/${id}`} className="block mb-4">
+          <div className="relative overflow-hidden rounded-lg bg-stone-100">
+            <Image
+              src={finalImageUrl}
+              alt={title || 'Product image'}
+              width={imageSize}
+              height={imageSize}
+              className="w-full object-contain aspect-square transition-transform duration-300 group-hover:scale-105"
+            />
+          </div>
         </Link>
-        <div className="flex flex-col mt-2">
-          <h3 className="text-sm font-semibold leading-tight mb-1">{title}</h3>
+        <div className="flex flex-col space-y-1.5 sm:space-y-2">
+          <h3 className="text-sm sm:text-base font-semibold leading-tight text-stone-900 line-clamp-2 min-h-8 sm:min-h-10">
+            {title}
+          </h3>
           {rating !== undefined && reviewCount !== undefined && (
             reviewCount > 0 ? (
-              <p className="flex items-center text-sm mb-1">
-                <span className="text-yellow-500 mr-1">{displayStars(rating || 0)}</span>
-                <span className="text-stone-600">({reviewCount} reviews)</span>
-              </p>
+              <div className="flex items-center gap-1">
+                <span className="text-yellow-500 text-xs sm:text-sm">{displayStars(rating || 0)}</span>
+                <span className="text-xs text-stone-600">({reviewCount})</span>
+              </div>
             ) : (
-              <p className="text-xs text-stone-400 mt-1">No reviews yet</p>
+              <p className="text-xs text-stone-400">No reviews yet</p>
             )
           )}
-          <div className="flex justify-between items-center w-full mt-2">
-            <p className="text-lg font-bold">${price.toLocaleString()}</p>
+          <div className="flex justify-between items-end gap-2 pt-1 sm:pt-2">
+            <p className="text-lg sm:text-xl font-bold text-forest-700">${price.toLocaleString()}</p>
             {showCartButton && (
               <Button
                 onClick={!inCart ? handleCart : undefined}
                 disabled={inCart}
-                variant={inCart ? "default" : "outline"}
-                className={inCart ? 'bg-forest-600 hover:bg-forest-700' : 'border-forest-600 text-forest-600 hover:bg-forest-600 hover:text-white'}
+                size="sm"
+                variant={inCart ? 'default' : 'outline'}
+                className={cn(
+                  'transition-colors',
+                  inCart && 'bg-forest-600 hover:bg-forest-700',
+                  !inCart && 'border-forest-600 text-forest-600 hover:bg-forest-600 hover:text-white'
+                )}
               >
-                {inCart ? 'In Cart' : 'Add to Cart'}
+                {inCart ? 'In Cart' : 'Add'}
               </Button>
             )}
           </div>

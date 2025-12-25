@@ -2,65 +2,69 @@
 
 import React from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { cn } from '@/lib/utils';
 
-// Type definition for Pagination component props
 interface PaginationProps {
   currentPage: number;
   totalPages: number;
 }
 
-// Common pagination component
+const BASE_BUTTON_CLASSES = 'min-w-9 h-9 rounded border border-stone-300 mx-1 cursor-pointer text-stone-700 hover:bg-stone-100 hover:text-stone-800 focus:outline-none focus:ring-2 focus:ring-forest-500 focus:ring-offset-2';
+const ACTIVE_BUTTON_CLASSES = 'bg-forest-500 text-white border-forest-500';
+const DISABLED_BUTTON_CLASSES = 'opacity-50 cursor-not-allowed';
+
 export default function Pagination({ currentPage, totalPages }: PaginationProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  // Event handler for page change
   const handlePageChange = (newPage: number) => {
-    // Get current query parameters
     const params = new URLSearchParams(searchParams.toString());
-    // Update page number in query parameters
     params.set('page', String(newPage));
-    // Update URL without reload
     router.push(`?${params.toString()}`);
   };
 
-  // Define common styles for pagination buttons
-  const baseClasses = 'min-w-9 h-9 rounded border border-stone-300 mx-1 cursor-pointer';
-  const hover = 'hover:bg-stone-100 hover:text-stone-800';
-  const active = 'bg-forest-500 text-white border-forest-500';
-  const disabled = 'opacity-50';
-
   return (
     <nav className="flex justify-center items-center mt-8" aria-label="Pagination">
-      {/* Previous (<) */}
       <button
         onClick={() => handlePageChange(currentPage - 1)}
         disabled={currentPage === 1}
-        className={`${baseClasses} text-stone-700 ${hover} ${currentPage === 1 ? disabled : ''}`}
+        className={cn(
+          BASE_BUTTON_CLASSES,
+          currentPage === 1 && DISABLED_BUTTON_CLASSES
+        )}
+        aria-label="Go to previous page"
       >
         &lt;
       </button>
 
-      {/* Page numbers */}
       {Array.from({ length: totalPages }, (_, i) => {
-        // Page numbers start from 1, so add 1 to array index (0-based)
         const page = i + 1;
-        // Make only the current page number active
-        const isActive = (page === currentPage);
+        const isActive = page === currentPage;
         return (
-          <button key={page} onClick={() => handlePageChange(page)} disabled={isActive}
-            className={`${baseClasses} ${isActive ? active : 'text-stone-700 ' + hover}`}
+          <button
+            key={page}
+            onClick={() => handlePageChange(page)}
+            disabled={isActive}
+            className={cn(
+              BASE_BUTTON_CLASSES,
+              isActive && ACTIVE_BUTTON_CLASSES
+            )}
+            aria-label={`Go to page ${page}`}
+            aria-current={isActive ? 'page' : undefined}
           >
             {page}
           </button>
         );
       })}
 
-      {/* Next (>) */}
       <button
         onClick={() => handlePageChange(currentPage + 1)}
         disabled={currentPage === totalPages}
-        className={`${baseClasses} text-stone-700 ${hover} ${currentPage === totalPages ? disabled : ''}`}
+        className={cn(
+          BASE_BUTTON_CLASSES,
+          currentPage === totalPages && DISABLED_BUTTON_CLASSES
+        )}
+        aria-label="Go to next page"
       >
         &gt;
       </button>

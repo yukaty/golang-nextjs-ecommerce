@@ -4,22 +4,23 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useCart, CartItem } from '@/hooks/useCart';
+import { Button } from '@/components/ui/button';
+import { Label } from '@/components/ui/label';
+import { Badge } from '@/components/ui/badge';
+import { cn } from '@/lib/utils';
+import { ERROR_MESSAGE_STYLE } from '@/lib/constants';
 import CartItemCard from '@/components/CartItemCard';
 
-// Shipping cost
-const SHIPPING_COST = 500; // Fixed at $5.00
+const SHIPPING_COST = 500;
 
-// Order confirmation page
 export default function OrderConfirmPage() {
   const router = useRouter();
-  const { cartItems, totalPrice } = useCart(); // Get cart information and control functions
-  const finalPrice = totalPrice + SHIPPING_COST; // Final total including shipping
+  const { cartItems, totalPrice } = useCart();
+  const finalPrice = totalPrice + SHIPPING_COST;
+  const [address, setAddress] = useState('');
+  const [isAgreed, setIsAgreed] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
 
-  const [address, setAddress] = useState(''); // Shipping address
-  const [isAgreed, setIsAgreed] = useState(false); // Agreement checkbox status
-  const [errorMessage, setErrorMessage] = useState(''); // Error message
-
-  // Event handler when payment button is clicked
   const handleConfirmPayment = async () => {
     if (!address.trim()) {
       setErrorMessage('Please enter your shipping address.');
@@ -30,7 +31,6 @@ export default function OrderConfirmPage() {
       return;
     }
 
-    // Create Stripe Checkout session
     const checkoutRes = await fetch('/api/orders/checkout', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -42,15 +42,13 @@ export default function OrderConfirmPage() {
     }
     const checkoutData = await checkoutRes.json();
     if (checkoutData.url) {
-      router.push(checkoutData.url); // Navigate to payment page
+      router.push(checkoutData.url);
     }
   };
 
-  // Event handler for cancel button
   const handleCancel = () => {
-    // Display confirmation dialog
     if (confirm('Your entered information will be discarded. Are you sure?')) {
-      router.push('/cart'); // Navigate to cart page
+      router.push('/cart');
     }
   };
 
@@ -58,7 +56,7 @@ export default function OrderConfirmPage() {
     <main className="container mx-auto px-4 py-8">
       <h1 className="text-center mb-6">Confirm Your Order</h1>
       {errorMessage && (
-        <p className="text-red-600 text-center mb-4">{errorMessage}</p>
+        <p className={`${ERROR_MESSAGE_STYLE} mb-4`}>{errorMessage}</p>
       )}
 
       {cartItems.length === 0 ? (
@@ -75,12 +73,18 @@ export default function OrderConfirmPage() {
           </div>
 
           <div className="mt-8 border-t border-stone-300 pt-6">
-            <label className="block font-bold mb-1" htmlFor="address">
-              Shipping Address<span className="ml-2 px-2 py-0.5 bg-red-500 text-white text-xs font-semibold rounded-md">Required</span>
-            </label>
+            <Label htmlFor="address" className="font-bold mb-1">
+              Shipping Address <Badge variant="destructive" className="ml-2">Required</Badge>
+            </Label>
             <textarea
-              id="address" value={address} placeholder="Enter your shipping address" required
-              className="w-full border border-stone-300 px-3 py-2 rounded-sm focus:ring-2 focus:ring-forest-500"
+              id="address"
+              value={address}
+              placeholder="Enter your shipping address"
+              required
+              className={cn(
+                "w-full rounded-md border border-input bg-background px-3 py-2 text-sm",
+                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+              )}
               onChange={(e) => setAddress(e.target.value)}
             />
           </div>
@@ -115,34 +119,35 @@ export default function OrderConfirmPage() {
             </p>
             <div className="mt-6 flex items-center">
               <input
-                type="checkbox" id="agreement-checkbox" checked={isAgreed}
+                type="checkbox"
+                id="agreement-checkbox"
+                checked={isAgreed}
                 onChange={(e) => setIsAgreed(e.target.checked)}
                 className="h-4 w-4 text-forest-600 border-stone-300 rounded focus:ring-forest-500"
               />
-              <label htmlFor="agreement-checkbox" className="ml-2 text-base font-semibold text-stone-800 leading-snug">
+              <Label htmlFor="agreement-checkbox" className="ml-2 text-base font-semibold text-stone-800 leading-snug">
                 I agree to the Terms of Service and Privacy Policy
-              </label>
+              </Label>
             </div>
           </div>
 
-          <div className="mt-8 flex justify-between items-center">
-            <button
+          <div className="mt-8 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 sm:gap-4">
+            <Button
               onClick={handleConfirmPayment}
               disabled={!isAgreed || !address.trim()}
-              className={`py-2 px-6 rounded-sm text-white ${
-                isAgreed && address.trim()
-                  ? 'bg-forest-500 hover:bg-forest-600'
-                  : 'bg-stone-400 cursor-not-allowed'
-              }`}
+              variant={isAgreed && address.trim() ? 'default' : 'secondary'}
+              className="w-full sm:w-auto order-2 sm:order-1"
             >
               Proceed to Payment
-            </button>
-            <button
-              type="button" onClick={handleCancel}
-              className="bg-stone-200 hover:bg-stone-300 text-stone-700 py-2 px-6 rounded-sm"
+            </Button>
+            <Button
+              type="button"
+              onClick={handleCancel}
+              variant="secondary"
+              className="w-full sm:w-auto order-1 sm:order-2"
             >
               Cancel
-            </button>
+            </Button>
           </div>
         </>
       )}

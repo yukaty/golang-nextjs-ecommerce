@@ -5,43 +5,50 @@ export default function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="bg-stone-800 py-4 text-white">
-      <div className="container mx-auto px-4 max-w-6xl grid grid-cols-1 md:grid-cols-[2.5fr_1.5fr_1fr] gap-8 border-b border-stone-700 pb-8 mb-8">
-        <div>
-          <h3 className="text-xl mb-4">About GoTrailhead</h3>
-          <p className="text-sm leading-relaxed">
-            Your trusted source for quality outdoor gear and equipment. Gear up
-            for your next adventure.
-          </p>
-        </div>
+    <footer className="bg-stone-800 py-10 sm:py-12 text-white mt-12 sm:mt-16">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-10 pb-8 mb-8 border-b border-stone-700">
+          <div>
+            <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4 text-stone-100">About GoTrailhead</h3>
+            <p className="text-sm text-stone-300 leading-relaxed">
+              Your trusted source for quality outdoor gear and equipment. Gear up for your next adventure.
+            </p>
+          </div>
 
-        <div>
-          <h3 className="text-xl mb-4">Quick Links</h3>
-          <ul className="space-y-2 list-none pl-0">
-            <li>
-              <Link href="/privacy">Privacy Policy</Link>
-            </li>
-            <li>
-              <Link href="/terms">Terms of Service</Link>
-            </li>
-          </ul>
-        </div>
+          <div>
+            <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4 text-stone-100">Quick Links</h3>
+            <ul className="space-y-2 text-sm text-stone-300">
+              <li>
+                <Link href="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link>
+              </li>
+              <li>
+                <Link href="/terms" className="hover:text-white transition-colors">Terms of Service</Link>
+              </li>
+              <li>
+                <Link href="/contact" className="hover:text-white transition-colors">Contact Us</Link>
+              </li>
+            </ul>
+          </div>
 
-        <div>
-          <h3 className="text-xl mb-4">Contact</h3>
-          <p>
-            <Link href="/contact">Contact Us</Link>
-          </p>
-          <div className="flex space-x-4 mt-4">
-            <FaInstagram className="w-6 h-6" />
-            <FaYoutube className="w-6 h-6" />
-            <FaXTwitter className="w-6 h-6" />
+          <div>
+            <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4 text-stone-100">Follow Us</h3>
+            <div className="flex space-x-4">
+              <a href="#" className="text-stone-300 hover:text-white transition-colors" aria-label="Instagram">
+                <FaInstagram className="w-5 h-5 sm:w-6 sm:h-6" />
+              </a>
+              <a href="#" className="text-stone-300 hover:text-white transition-colors" aria-label="YouTube">
+                <FaYoutube className="w-5 h-5 sm:w-6 sm:h-6" />
+              </a>
+              <a href="#" className="text-stone-300 hover:text-white transition-colors" aria-label="Twitter">
+                <FaXTwitter className="w-5 h-5 sm:w-6 sm:h-6" />
+              </a>
+            </div>
           </div>
         </div>
-      </div>
 
-      <div className="container mx-auto px-4 pb-8 text-center text-sm">
-        <p>&copy; {currentYear} GoTrailhead. All Rights Reserved.</p>
+        <div className="text-center text-sm text-stone-400">
+          <p>&copy; {currentYear} GoTrailhead. All Rights Reserved.</p>
+        </div>
       </div>
     </footer>
   );

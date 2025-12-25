@@ -1,15 +1,12 @@
 import Link from 'next/link';
-import { type ProductData } from '@/types/product';
-import Pagination from '@/components/Pagination'; // Pagination component
+import { cn } from '@/lib/utils';
+import { ProductAdminItem } from '@/lib/types';
+import { TABLE_CELL_STYLE, SUCCESS_MESSAGE_STYLE } from '@/lib/constants';
+import Pagination from '@/components/Pagination';
 import DeleteLink from '@/app/admin/products/DeleteLink';
 
-// Product data type definition
-type Product = Pick<ProductData, 'id' | 'name' | 'price' | 'stock' | 'updated_at'>;
-
-// Data required for products page
 interface ProductsPageData {
-  products: Product[]; // Product data array
-  // Pagination information
+  products: ProductAdminItem[];
   pagination: {
     currentPage: number;
     perPage: number;
@@ -18,35 +15,25 @@ interface ProductsPageData {
   };
 }
 
-// Admin product list page
 export default async function AdminProductsPage({
   searchParams,
 }: {
-  searchParams?: Promise<{ [key: string]: string | string[] | undefined }>
+  searchParams?: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
-  // searchParams obtained asynchronously, so await is required
   const sp = await searchParams;
-
-  // Get required data from URL query parameters
   const page = Number(sp?.page ?? '1');
   const perPage = Number(sp?.perPage ?? '20');
 
-  // Get product data from products API
   const res = await fetch(`${process.env.API_BASE_URL}/api/products?page=${page}&perPage=${perPage}`, {
     cache: 'no-store'
   });
 
-  // Get data returned from API
-  const { products, pagination }: ProductsPageData = await res.json()
+  const { products, pagination }: ProductsPageData = await res.json();
   if (!Array.isArray(products)) {
     console.error('Failed to load product data.');
     return <p className="text-center text-stone-500 text-lg py-10">Failed to load product data.</p>;
   }
 
-  // Common table styles
-  const tableStyle = 'px-5 py-3 border-b border-stone-300';
-
-  // Set message based on query parameters
   const message =
     sp?.registered ? 'Product has been registered.' :
       sp?.edited ? 'Product has been updated.' :
@@ -56,7 +43,7 @@ export default async function AdminProductsPage({
   return (
     <>
       {message && (
-        <div className="w-full bg-green-100 text-green-800 p-3 text-center shadow-md flex items-center justify-center">
+        <div className={SUCCESS_MESSAGE_STYLE}>
           {message}
         </div>
       )}
@@ -75,32 +62,32 @@ export default async function AdminProductsPage({
           <table className="min-w-full leading-normal">
             <thead>
               <tr className="bg-stone-200 text-stone-700 text-left">
-                <th className={tableStyle}>ID</th>
-                <th className={tableStyle}>Product Name</th>
-                <th className={tableStyle}>Price (incl. tax)</th>
-                <th className={tableStyle}>Stock</th>
-                <th className={tableStyle}>Last Updated</th>
-                <th className={tableStyle}></th>
+                <th className={TABLE_CELL_STYLE}>ID</th>
+                <th className={TABLE_CELL_STYLE}>Product Name</th>
+                <th className={TABLE_CELL_STYLE}>Price (incl. tax)</th>
+                <th className={TABLE_CELL_STYLE}>Stock</th>
+                <th className={TABLE_CELL_STYLE}>Last Updated</th>
+                <th className={TABLE_CELL_STYLE}></th>
               </tr>
             </thead>
             <tbody>
               {products.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className={`${tableStyle} text-center text-stone-500`}>
+                  <td colSpan={6} className={cn(TABLE_CELL_STYLE, 'text-center text-stone-500')}>
                     No products found.
                   </td>
                 </tr>
               ) : (
                 products.map((product) => (
                   <tr key={product.id} className="hover:bg-stone-100">
-                    <td className={tableStyle}>{product.id}</td>
-                    <td className={tableStyle}>{product.name}</td>
-                    <td className={tableStyle}>${product.price.toLocaleString()}</td>
-                    <td className={tableStyle}>{product.stock}</td>
-                    <td className={tableStyle}>
+                    <td className={TABLE_CELL_STYLE}>{product.id}</td>
+                    <td className={TABLE_CELL_STYLE}>{product.name}</td>
+                    <td className={TABLE_CELL_STYLE}>${product.price.toLocaleString()}</td>
+                    <td className={TABLE_CELL_STYLE}>{product.stock}</td>
+                    <td className={TABLE_CELL_STYLE}>
                       {product.updated_at ? new Date(product.updated_at).toLocaleDateString() : '-'}
                     </td>
-                    <td className={tableStyle}>
+                    <td className={TABLE_CELL_STYLE}>
                       <Link
                         href={`/admin/products/${product.id}`}
                         className="text-forest-600 hover:text-forest-700 mr-6"
@@ -117,11 +104,12 @@ export default async function AdminProductsPage({
         </div>
 
         <section className="mb-8">
-          {pagination.totalPages > 0 &&
+          {pagination.totalPages > 0 && (
             <Pagination
               currentPage={pagination.currentPage}
               totalPages={pagination.totalPages}
-            />}
+            />
+          )}
         </section>
       </div>
     </>

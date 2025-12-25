@@ -2,11 +2,10 @@
 
 import Link from 'next/link';
 import { useCart, CartItem } from '@/hooks/useCart';
+import { Button } from '@/components/ui/button';
 import CartItemCard from '@/components/CartItemCard';
 
-// Shopping cart page
 export default function CartPage() {
-  // Get cart information and control functions
   const { cartItems, removeItem, updateQuantity, totalPrice } = useCart();
 
   return (
@@ -32,17 +31,16 @@ export default function CartPage() {
             ))}
           </div>
 
-          <div className="mt-8 flex justify-between items-center border-t border-stone-300 pt-6">
-            <div className="flex flex-col">
-              <p className="text-2xl font-bold">Total: ${totalPrice.toLocaleString()}</p>
-              <p className="text-stone-500">All prices include tax.</p>
+          <div className="mt-8 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 border-t border-stone-300 pt-6">
+            <div className="flex flex-col text-center sm:text-left">
+              <p className="text-xl sm:text-2xl font-bold">Total: ${totalPrice.toLocaleString()}</p>
+              <p className="text-sm sm:text-base text-stone-500">All prices include tax.</p>
             </div>
-            <Link
-              href="/order-confirm"
-              className="bg-forest-500 hover:bg-forest-600 text-white py-2 px-6 rounded"
-            >
-              Proceed to Checkout
-            </Link>
+            <Button asChild className="w-full sm:w-auto">
+              <Link href="/order-confirm">
+                Proceed to Checkout
+              </Link>
+            </Button>
           </div>
         </>
       )}

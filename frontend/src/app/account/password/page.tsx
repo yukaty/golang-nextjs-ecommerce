@@ -3,22 +3,26 @@
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { FORM_CONTAINER_STYLE, ERROR_MESSAGE_STYLE, CONNECTION_ERROR_MESSAGE } from '@/lib/constants';
+import { handleApiResponse } from '@/lib/api';
 
-// Password change page
 export default function PasswordChangePage() {
   const router = useRouter();
   const [errorMessage, setErrorMessage] = useState('');
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault(); // Cancel default submit behavior
-    setErrorMessage(''); // Clear errors before submission
+    e.preventDefault();
+    setErrorMessage('');
 
     const formData = new FormData(e.currentTarget);
     const oldPassword = formData.get('oldPassword') as string;
     const newPassword = formData.get('newPassword') as string;
     const confirmPassword = formData.get('confirmPassword') as string;
 
-    // Input data validation
     if (!oldPassword?.trim() || !newPassword?.trim() || !confirmPassword?.trim()) {
       setErrorMessage('Please fill in all required fields.');
       return;
@@ -28,30 +32,25 @@ export default function PasswordChangePage() {
       return;
     }
 
-    try { // Send PUT request to password change API
+    try {
       const res = await fetch('/api/users/password', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ oldPassword, newPassword }),
       });
 
-      if (res.ok) { // Navigate to My Account on successful change
-        router.push('/account?password-changed=1');
-      } else { // Display error info on change failure
-        const data = await res.json();
-        setErrorMessage(data.error || 'Password change failed.');
+      const { error } = await handleApiResponse<unknown>(res);
+
+      if (error) {
+        setErrorMessage(error);
+        return;
       }
+
+      router.push('/account?password-changed=1');
     } catch {
-      setErrorMessage('A connection error occurred.');
+      setErrorMessage(CONNECTION_ERROR_MESSAGE);
     }
   };
-
-  // Common input field styles
-  const inputStyle = 'w-full border border-stone-300 px-3 py-2 rounded-sm focus:ring-2 focus:ring-forest-500';
-  // Common label styles
-  const labelStyle = "block font-bold mb-1";
-  // Common badge styles
-  const badgeStyle = "ml-2 px-2 py-0.5 bg-red-500 text-white text-xs font-semibold rounded-md";
 
   return (
     <main className="max-w-md mx-auto py-10">
@@ -62,28 +61,34 @@ export default function PasswordChangePage() {
       </div>
       <h1 className="text-center mb-6">Change Password</h1>
       {errorMessage && (
-        <p className="text-red-600 text-center mt-8">{errorMessage}</p>
+        <p className={`${ERROR_MESSAGE_STYLE} mt-8`}>{errorMessage}</p>
       )}
 
-      <form onSubmit={handleSubmit} className="w-full space-y-6 p-8 bg-white shadow-lg rounded-xl">
-        <label className={labelStyle} htmlFor="oldPassword">
-          Current Password<span className={badgeStyle}>Required</span>
-        </label>
-        <input type="password" id="oldPassword" name="oldPassword" required className={inputStyle} />
+      <form onSubmit={handleSubmit} className={FORM_CONTAINER_STYLE}>
+        <div className="space-y-2">
+          <Label htmlFor="oldPassword" className="font-bold">
+            Current Password <Badge variant="destructive" className="ml-2">Required</Badge>
+          </Label>
+          <Input type="password" id="oldPassword" name="oldPassword" required />
+        </div>
 
-        <label className={labelStyle} htmlFor="newPassword">
-          New Password<span className={badgeStyle}>Required</span>
-        </label>
-        <input type="password" id="newPassword" name="newPassword" required className={inputStyle} />
+        <div className="space-y-2">
+          <Label htmlFor="newPassword" className="font-bold">
+            New Password <Badge variant="destructive" className="ml-2">Required</Badge>
+          </Label>
+          <Input type="password" id="newPassword" name="newPassword" required />
+        </div>
 
-        <label className={labelStyle} htmlFor="confirmPassword">
-          Confirm New Password<span className={badgeStyle}>Required</span>
-        </label>
-        <input type="password" id="confirmPassword" name="confirmPassword" required className={inputStyle} />
+        <div className="space-y-2">
+          <Label htmlFor="confirmPassword" className="font-bold">
+            Confirm New Password <Badge variant="destructive" className="ml-2">Required</Badge>
+          </Label>
+          <Input type="password" id="confirmPassword" name="confirmPassword" required />
+        </div>
 
-        <button type="submit" className="w-full mt-2 bg-forest-500 hover:bg-forest-600 text-white py-2 rounded-sm">
+        <Button type="submit" className="w-full mt-2">
           Update
-        </button>
+        </Button>
       </form>
     </main>
   );

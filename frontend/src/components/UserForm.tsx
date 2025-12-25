@@ -5,21 +5,18 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { FORM_CONTAINER_STYLE } from '@/lib/constants';
 
-// Type definition for UserForm component props
 interface UserFormProps {
-  // Event handler executed on form submission
   onSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
-  // Initial values for input fields
   initialValues?: {
     name: string;
     email: string;
   };
-  submitLabel: string; // Label for form submit button
-  withPassword?: boolean; // Whether to include password input fields
+  submitLabel: string;
+  withPassword?: boolean;
 }
 
-// Common user form component
 export default function UserForm({
   onSubmit,
   initialValues = { name: '', email: '' },
@@ -27,7 +24,7 @@ export default function UserForm({
   withPassword = false,
 }: UserFormProps) {
   return (
-    <form onSubmit={onSubmit} className="w-full space-y-6 p-8 bg-white shadow-lg rounded-xl">
+    <form onSubmit={onSubmit} className={FORM_CONTAINER_STYLE}>
       <div className="space-y-2">
         <Label htmlFor="name" className="font-bold">
           Name <Badge variant="destructive" className="ml-2">Required</Badge>
